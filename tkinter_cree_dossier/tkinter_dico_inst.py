@@ -26,8 +26,12 @@ class Dico:
 			return self.__getattribute__(f'{k}')
 
 	def __str__(self):
-		montrer = lambda obj: (obj if type(obj) == int else f'<id={id(obj)}>')
-		return f'<id={id(self)}> i:{self.i}, X:{self.X}, x:{list(map(montrer,self.x))}, xt:{self.xt}, y:{self.y}, p:{self.p}, sortie:{self.sortie}'
+		montrer = lambda obj: (obj if type(obj) in (int, type(None)) else f'<id={id(obj)}>')
+		#print(list(map(type, self.x)))
+		i = str(self.i)
+		if (len(i) < 60):
+			i = i + " "*(60 - len(i))
+		return f'<id={id(self)}> i:{i}, X:{self.X}, x:{list(map(montrer,self.x))}, xt:{self.xt}, y:{self.y}, p:{self.p}, sortie:{self.sortie}'
 
 
 	def copier(self):

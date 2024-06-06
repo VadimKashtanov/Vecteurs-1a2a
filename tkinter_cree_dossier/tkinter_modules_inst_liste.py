@@ -45,9 +45,7 @@ class MODULE_{nom_classe}(Module_Mdl):	#	A+B
 			Dico(i={nom_classe}, X=X, x={[None for _ in i.X]}, xt={[None for _ in i.X]}, y=Y, p=params, sortie=True)
 		]
 
-	def module_vers_model(self):
-		self.cree_ix()
-		self.insts_et_connections(ix)
+		return self.ix
 
 modules_inst += [MODULE_{nom_classe}]
 """

@@ -247,7 +247,7 @@ class DraggableApp(tk.Tk):
 		move_up_btn    = tk.Button(self.fleches_frame, image=arrow_up_img,    command=self.move_objects_up   )
 		move_up_btn.grid   (row=0, column=1)
 		move_down_btn  = tk.Button(self.fleches_frame, image=arrow_down_img,  command=self.move_objects_down )
-		move_down_btn.grid (row=2, column=1)
+		move_down_btn.grid (row=1, column=1)
 		move_left_btn  = tk.Button(self.fleches_frame, image=arrow_left_img,  command=self.move_objects_left )
 		move_left_btn.grid (row=1, column=0)
 		move_right_btn = tk.Button(self.fleches_frame, image=arrow_right_img, command=self.move_objects_right)
