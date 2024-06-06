@@ -28,7 +28,7 @@ static __global__ void kerd__kconvl2d_stricte___simple(
 		//
 		float s = 0;
 		//
-		float ds = dy[ty*Y + c1*so_X + _x];
+		float ds = dy[ty*Y + c1*so_X + _x];// / (float)C0;
 		//
 		FOR(0, c0, C0) {
 			for (int kx=-N; kx < N+1; kx++) {

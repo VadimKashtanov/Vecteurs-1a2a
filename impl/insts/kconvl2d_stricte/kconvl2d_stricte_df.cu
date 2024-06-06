@@ -35,7 +35,7 @@ static __global__ void d_kerd__kconvl2d_stricte___simple(
 		if (threadIdx.z == 0) __dy[threadIdx.y][threadIdx.x] = dy[ty*Y + c1*so_X*so_Y + _y*so_X + _x];
 		__syncthreads();
 		//float _dy = dy[ty*Y + c1*so_X*so_Y + _y*so_X + _x];
-		float _dy = __dy[threadIdx.y][threadIdx.x];
+		float _dy = __dy[threadIdx.y][threadIdx.x];// / (float)C0;
 		//
 		//FOR(0, c0, C0) {
 		for (int kx=-N; kx < N+1; kx++) {

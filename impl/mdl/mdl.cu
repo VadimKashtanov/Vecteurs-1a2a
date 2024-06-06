@@ -63,8 +63,8 @@ void liberer_mdl(Mdl_t * mdl) {
 	free(mdl->inst);
 	//
 	FOR(0, i, mdl->BLOQUES) free(mdl->instructions[i]);
-	free(mdl->elements);
 	free(mdl->instructions);
+	free(mdl->elements);
 	//
 	free(mdl);
 };

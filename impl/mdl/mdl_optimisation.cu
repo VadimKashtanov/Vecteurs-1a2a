@@ -74,17 +74,6 @@ static void mise_a_jour_position(
 };
 
 void mdl_optimisation(Mdl_t * mdl) {
-	/*mdl->BLOQUES = mdl->insts;
-	mdl->elements = (uint*)malloc(sizeof(uint) * mdl->insts);
-	FOR(0, i, mdl->insts)
-		mdl->elements[i] = 0;
-	mdl->instructions = (uint**)malloc(sizeof(uint*) * mdl->insts);
-	FOR(0, i, mdl->insts)
-		mdl->instructions[i] = (uint*)malloc(sizeof(uint) * mdl->insts);
-	//
-	uint a_été_inclue[mdl->insts];
-	FOR(0, i, mdl->insts) a_été_inclue[i] = 0;*/
-
 	uint I = mdl->insts;
 	//
 	uint grille[I*I];
@@ -101,12 +90,12 @@ void mdl_optimisation(Mdl_t * mdl) {
 	uint optimisable = false;
 	do {
 		//
-		printf(" ---------- Grille --------------\n");
+		/*printf(" ---------- Grille --------------\n");
 		FOR(0, i, I) {
 			printf("%i| ", i);
 			FOR(0, j, nb[i]) printf("%i ", grille[i*I + j]);
 			printf("\n");
-		}
+		}*/
 		//
 		optimisable = false;
 		//
@@ -134,7 +123,7 @@ void mdl_optimisation(Mdl_t * mdl) {
 				uint de_ligne = positions_ligne[i];
 				uint vers_ligne = positions_ligne[i] - 1;
 				uint de_elm = position_elm[i];
-				printf("Déplacement de l0=%i e0=%i l1=%i\n", de_ligne, de_elm, vers_ligne);
+				//printf("Déplacement de l0=%i e0=%i l1=%i\n", de_ligne, de_elm, vers_ligne);
 				deplacer(
 					de_ligne, vers_ligne, de_elm,
 					I, grille, nb);
@@ -147,4 +136,49 @@ void mdl_optimisation(Mdl_t * mdl) {
 			if (optimisable) break;
 		}
 	} while (optimisable);
+	//
+	/*printf(" ---------- Grille FINALE --------------\n");
+	FOR(0, i, I) {
+		printf("%i| ", i);
+		FOR(0, j, nb[i]) printf("%i ", grille[i*I + j]);
+		printf("\n");
+	}*/
+	//
+	uint premier_nulle = mdl->insts;
+	FOR(0, i, I) {
+		if (nb[i] == 0) {
+			premier_nulle = i;
+			break;
+		}
+	}
+	//
+	mdl->BLOQUES = premier_nulle-1+1;
+	//
+	mdl->elements = (uint*)malloc(sizeof(uint) * mdl->BLOQUES);
+	FOR(0, i, mdl->BLOQUES)
+		mdl->elements[i] = nb[i];
+	//
+	mdl->instructions = (uint**)malloc(sizeof(uint*) * mdl->BLOQUES);
+	FOR(0, i, mdl->BLOQUES) {
+		mdl->instructions[i] = (uint*)malloc(sizeof(uint) * nb[i]);
+		FOR(0, j, nb[i])
+			mdl->instructions[i][j] = grille[i*I + j];
+	}
+};
+
+void mdl_desoptimiser(Mdl_t * mdl) {
+	FOR(0, i, mdl->BLOQUES) free(mdl->instructions[i]);
+	free(mdl->instructions);
+	free(mdl->elements);
+	//
+	mdl->BLOQUES = mdl->insts;
+	mdl->elements = (uint*)malloc(sizeof(uint) * mdl->BLOQUES);
+	FOR(0, i, mdl->BLOQUES)
+		mdl->elements[i] = 1;
+	//
+	mdl->instructions = (uint**)malloc(sizeof(uint*) * mdl->BLOQUES);
+	FOR(0, i, mdl->BLOQUES) {
+		mdl->instructions[i] = (uint*)malloc(sizeof(uint) * 1);
+		mdl->instructions[i][0] = i;
+	}
 };

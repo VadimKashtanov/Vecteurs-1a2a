@@ -54,28 +54,115 @@ static void plumer_le_score(Mdl_t * mdl, BTCUSDT_t * btcusdt) {
 	}
 };
 
+void visualiser_vitesses(char * mdl_bin, BTCUSDT_t * btcusdt) {
+	//	Sans que ça soit optimisé
+	Mdl_t * mdl = ouvrire_mdl(mdl_bin);
+	//
+	mdl_desoptimiser(mdl);
+	//
+	uint ts[GRAND_T];
+	FOR(0, t, GRAND_T)
+		ts[t] = rand() % (btcusdt->T - MEGA_T - 1);
+	uint * ts__d = cpu_vers_gpu<uint>(ts, GRAND_T);
+	//
+	float * temps = mdl_allez_retour_temps(mdl, btcusdt, ts__d);
+	//
+	temps; // INSTS + INSTS (F et F')
+	//
+	//
+	printf(" --- Temps F(x) ---\n");
+	float _max = max_lst<float>(temps+0*mdl->BLOQUES, mdl->BLOQUES);
+	printf("temp max = %f\n", _max);
+	FOR(0, i, mdl->BLOQUES) {
+		uint pts = (uint)roundf(30.0*temps[0+mdl->BLOQUES + i] / _max);
+		printf("%4.i| ", i);
+		FOR(0, j, pts) printf("\033[103m_\033[0m");
+		FOR(pts, j, 30) printf(" ");
+		printf("  %s\n", inst_Nom[mdl->inst[i]->ID]);
+	}
+	//
+	//
+	printf(" --- Temps dF(x) ---\n");
+	_max = max_lst<float>(temps+1*mdl->BLOQUES, mdl->BLOQUES);
+	printf("temp max = %f\n", _max);
+	FOR(0, i, mdl->BLOQUES) {
+		uint pts = (uint)roundf(30.0*temps[1+mdl->BLOQUES + i] / _max);
+		printf("%4.i| ", i);
+		FOR(0, j, pts) printf("\033[104m_\033[0m");
+		FOR(pts, j, 30) printf(" ");
+		printf("  %s\n", inst_Nom[mdl->inst[i]->ID]);
+	}
+	//
+	free(temps);
+	//
+	//
+	liberer_mdl(mdl);
+};
+
+void montrer_Y_du_model(Mdl_t * mdl, BTCUSDT_t * btcusdt) {
+	uint ts[GRAND_T];
+	FOR(0, t, GRAND_T)
+		ts[t] = rand() % (btcusdt->T - MEGA_T - 1);
+	uint * ts__d = cpu_vers_gpu<uint>(ts, GRAND_T);
+	//
+	mdl_allez_retour(mdl, btcusdt, ts__d);
+	//
+	printf(" ======= Plumer Y ======\n");
+	printf("mega_t = | ");
+	FOR(0, i, MIN2(MEGA_T, 19)) printf("    %i   |", i);
+	printf("\n");
+	FOR(0, i, mdl->insts)
+	{
+		Inst_t * inst = mdl->inst[i];
+		printf("#%i -- ID=%i %s Y=%i --\n", i, inst->ID, inst_Nom[inst->ID], inst->Y);
+		//
+		float * y = gpu_vers_cpu<float>(inst->y__d, inst->Y * GRAND_T * MEGA_T);
+		//
+		FOR(0, j, inst->Y) {
+			printf("%i| ", j);
+			FOR(0, mega_t, MIN2(MEGA_T, 19)) {
+				printf("%+f ", y[mega_t*GRAND_T*inst->Y + 0*inst->Y + j]);
+			}
+			printf("\n");
+		}
+		//
+		free(y);
+	};
+	//
+	cudafree<uint>(ts__d);
+};
+
 int main() {
-	srand(0);
+	srand(time(NULL));
 	verif_insts();
 
-	//	--
-	printf(" ============== Verif 1e5 ============== \n");
+	//	=========================================================
+	//	=========================================================
+	//	=========================================================
 	verif_mdl_1e5();
 
 	//exit(0);
 
-	printf(" ============== Vrai Programme ============== \n");
-	//	--- Données ---
+	//	=========================================================
+	//	=========================================================
+	//	=========================================================
 	BTCUSDT_t * btcusdt = cree_btcusdt("prixs/dar.bin");
 	MSG("Kconvl f & df optimisée (Important)");
 	MSG("Pool2d optimisé (f et df)");
-	MSG("Faire depuis 2017");
-	//
-	MSG("Chiffre Haut, Bas, Normale");
 	//
 	MSG("ADAM n'est pas utilisé");
 	//
 	MSG("P du model peut etre changé. P=3 par exemple")
+
+	//	=========================================================
+	//	=========================================================
+	//	=========================================================
+
+	//visualiser_vitesses("mdl.bin", btcusdt);
+
+	//	=========================================================
+	//	=========================================================
+	//	=========================================================
 
 	//	--- Re-cree le Model ---
 	//cree_mdl_depuis_pre_mdl(btcusdt);
@@ -83,29 +170,41 @@ int main() {
 	//	--- Mdl_t ---
 	Mdl_t * mdl = ouvrire_mdl("mdl.bin");
 	plumer_model(mdl);
+	montrer_Y_du_model(mdl, btcusdt);
 	//tester_le_model(mdl, btcusdt);
 
-	plumer_le_score(mdl, btcusdt);
-
+	//	=========================================================
+	//	=========================================================
+	//	=========================================================
+	//
+//plumer_le_score(mdl, btcusdt);
+	//
 	uint e = 0;
 	while (true) {
 		printf(" === Echope %i ===\n", e);
 		
 		//
-		uint I = 200;
+		uint I = 50;//300;
+		uint tous_les = 10;
 		
 		//
+		srand(time(NULL));
 		uint ts[GRAND_T];
 		FOR(0, t, GRAND_T)
 			ts[t] = rand() % (btcusdt->T - MEGA_T - 1);
 		uint * ts__d = cpu_vers_gpu<uint>(ts, GRAND_T);
 
 		//
-		opti(mdl, btcusdt, ts__d, I, ADAM, 1e-3);
+		opti(mdl, btcusdt, ts__d, I, tous_les, ADAM, 5e-4);
 		ecrire_mdl("mdl.bin", mdl);
+
+		if (e % 10 == 0) {
+			printf("pause ...\n");
+			sleep(2);
+		}
 		
 		//
-		if (e % 10 == 0) {
+		if (e % 50 == 0 && e != 0) {
 			plumer_le_score(mdl, btcusdt);
 		}
 		e++;
@@ -115,9 +214,6 @@ int main() {
 	}
 
 	//
-	ecrire_mdl("mdl.bin", mdl);
-
-	//
 	//liberer_mdl    (mdl    );
-	liberer_btcusdt(btcusdt);
+	//liberer_btcusdt(btcusdt);
 };

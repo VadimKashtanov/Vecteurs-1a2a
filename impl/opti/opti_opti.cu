@@ -11,6 +11,7 @@ void opti(
 	BTCUSDT_t * btcusdt,
 	uint      *   ts__d,
 	uint              I,
+	uint       tous_les,
 	uint        methode,
 	float         alpha
 ) {
@@ -34,7 +35,7 @@ void opti(
 			if (methode == ADAM) adam(mdl, hist, i, alpha);
 		}
 		//
-		if (i % 25 == 0) {
+		if (i % tous_les == 0) {
 			float s = mdl_S(mdl, btcusdt, ts__d);
 			float * p0 = mdl_pourcent(mdl, btcusdt, ts__d, 0.0);
 			float * p1 = mdl_pourcent(mdl, btcusdt, ts__d, 1.0);
@@ -62,4 +63,12 @@ void opti(
 			free(p8);
 		};
 	};
+	//
+	FOR(0, h, hists[methode]) {
+		FOR(0, i, mdl->insts) {
+			cudafree<float>(hist[h][i]);
+		}
+		free(hist[h]);
+	}
+	free(hist);
 }

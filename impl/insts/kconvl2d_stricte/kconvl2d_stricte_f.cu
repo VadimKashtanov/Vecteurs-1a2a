@@ -43,7 +43,7 @@ static __global__ void kerd__kconvl2d_stricte___simple(
 				}
 			}
 		}
-		y[ty*Y + c1*so_X*so_Y + _y*so_X + _x] = s;
+		y[ty*Y + c1*so_X*so_Y + _y*so_X + _x] = s;// / C0;
 	}
 };
 

@@ -19,10 +19,10 @@ __global__ static void kerd_adam(
 		float corr_v = _v / (1 - adam_beta1);
 		float corr_s = _s / (1 - adam_beta2);
 		//
-		float ch  = alpha * _grad * corr_v / (sqrtf(corr_s) + 1e-8);
+		float ch  = alpha * _grad;//*/alpha * _grad * corr_v / (sqrtf(corr_s) + 1e-8);
 		float reg = alpha * L2_regularisation * p[thx];
 		//
-		p[thx] -= alpha * _grad/*(ch + reg)*/;
+		p[thx] -= (ch + reg);
 		v[thx] = _v;
 		s[thx] = _s;
 	}
