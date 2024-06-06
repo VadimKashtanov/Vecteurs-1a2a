@@ -2,7 +2,7 @@
 
 #include "etc.cuh"
 
-#define GRAND_T (16)//64//(16*16)//(    16)
+#define GRAND_T (10*16)//64//(16*16)//(    16)
 #define  MEGA_T 24//24//(7*24*2)
 
 //Reseaux tanachiques

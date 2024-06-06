@@ -2,7 +2,7 @@
 
 #include "mdl.cuh"
 
-#define L2_regularisation 0.001
+#define L2_regularisation 0.0
 
 #define ADAM 0
 #define ADAM_HISTOIRE 2
@@ -19,6 +19,7 @@ void opti(
 	BTCUSDT_t * btcusdt,
 	uint      *   ts__d,
 	uint              I,
+	uint       tous_les,
 	uint        methode,
 	float         alpha
 );

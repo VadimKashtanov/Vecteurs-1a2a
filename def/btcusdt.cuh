@@ -5,7 +5,7 @@
 #define  D(y,c) (powf((y - sng(c)), 2)/2)
 #define dD(y,c) (powf((y - sng(c)), 1)  )
 
-#define K(y,c)  (powf((abs(c))*100, 0.25))//(powf(c*100, 0.25))
+#define K(y,c)  (sng(y)==sng(c) ? powf((abs(c))*100, 0.25) : powf((abs(c))*100, 2.00))
 
 #define  S(y,c) ( D(y,c) * K(y,c))
 #define dS(y,c) (dD(y,c) * K(y,c))
