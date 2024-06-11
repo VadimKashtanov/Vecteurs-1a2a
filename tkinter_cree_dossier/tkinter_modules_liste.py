@@ -11,7 +11,7 @@ from tkinter_cree_dossier.tkinter_insts import i_Mul2, i_Mul3
 from tkinter_cree_dossier.tkinter_insts import i_Pool2_1d, i_Pool2x2_2d
 from tkinter_cree_dossier.tkinter_insts import i_Softmax
 from tkinter_cree_dossier.tkinter_insts import i_Somme2, i_Somme3, i_Somme4
-from tkinter_cree_dossier.tkinter_insts import i_Y, i_Y_canalisation
+from tkinter_cree_dossier.tkinter_insts import i_Y, i_Y_canalisation, i_Y_union_2
 
 from tkinter_cree_dossier.tkinter_modules_inst_liste import *
 
@@ -53,6 +53,51 @@ class CHAINE_N_DOT1D(Module_Mdl):
 		self.ix[-1].sortie = True
 
 		return self.ix
+
+class CHAINE_N_DOT1D_RECURENTE(Module_Mdl):
+	nom = "Chaine Dot1d Recurrente"
+	X, Y = [0], [0]
+	X_noms, Y_noms = ["X"], ["Y"] # LSTM [X], [H]
+	params = {
+		'N' : 1,
+		'H' : 0,
+		'C0' : 1,
+		'activ' : 0
+	}
+	def cree_ix(self):
+		#	Params
+		N     = self.params[  'N'  ]
+		H     = self.params[  'H'  ]
+		C0    = self.params[ 'C0'  ]
+		activ = self.params['activ']
+		X = self.X[0]
+		Y = self.Y[0]
+
+		assert H>0
+		assert N>1
+
+		#	------------------
+
+		moi = "Moi"
+
+		self.ix = [
+			Dico(i=i_Dot1d_XY, X=[X,moi], x=[None,moi], xt=[None,-1], y=H, p=[C0,activ], sortie=False)
+		]
+
+		for n in range(1, N):
+			self.ix += [Dico(i=i_Dot1d_XY, X=[H,moi], x=[self.ix[-1],moi], xt=[0,-1], y=H, p=[C0,activ], sortie=False)]
+
+		self.ix[-1].y = Y
+
+		for ix in self.ix:
+			ix.X[1] = ix.y
+			ix.x[1] = ix
+
+		self.ix[-1].sortie = True
+
+		return self.ix
+
+############################################
 
 class GRILLE_XY_DOT1D(Module_Mdl):
 	nom = "Grille XY dot1d"
@@ -989,6 +1034,8 @@ class LSTM1D_PARRALLELE(Module_Mdl):	#	f(ax0+bx1+cx2+d)
 
 modules = [
 	CHAINE_N_DOT1D,
+	CHAINE_N_DOT1D_RECURENTE,
+	#
 	#GRILLE_XY_DOT1D,
 	#GRILLE_XY_N_DOT1D,
 	LSTM1D,

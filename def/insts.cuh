@@ -3,7 +3,7 @@
 #include "meta.cuh"
 #include "btcusdt.cuh"
 
-#define INSTS 19
+#define INSTS 20
 
 #define MAX_PARAMS 5
 #define MAX_XS     4

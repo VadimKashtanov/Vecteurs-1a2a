@@ -4,7 +4,8 @@
 #include "etc/macro.cuh"
 
 //  Outils
-float   rnd();
+float      rnd();
+float poid_1_1();
 float signe(float x);
 
 void titre(char * str);

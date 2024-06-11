@@ -13,7 +13,7 @@ from tkinter_cree_dossier.tkinter_insts import i_Mul2, i_Mul3
 from tkinter_cree_dossier.tkinter_insts import i_Pool2_1d, i_Pool2x2_2d
 from tkinter_cree_dossier.tkinter_insts import i_Softmax
 from tkinter_cree_dossier.tkinter_insts import i_Somme2, i_Somme3, i_Somme4
-from tkinter_cree_dossier.tkinter_insts import i_Y, i_Y_canalisation
+from tkinter_cree_dossier.tkinter_insts import i_Y, i_Y_canalisation, i_Y_union_2
 
 conn = lambda sortie,inst,entree: (sortie, (inst,entree))
 

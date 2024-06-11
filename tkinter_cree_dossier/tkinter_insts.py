@@ -360,6 +360,20 @@ class i_Y_canalisation(Inst):
 		C0 = self.params[0]
 		assert self.Y == self.X[0] * C0
 
+class i_Y_union_2(Inst):
+	nom = "Y_union_2"
+	params = []
+	params_str = []
+	X = [0,0]
+	Y =  0
+
+	def assert_coherance(self):
+		assert len(self.X) == 2
+		assert self.Y == (self.X[0]+self.X[1])
+
+		#	Params
+		assert len(self.params) == 0
+
 ##########################################
 liste_insts = [
 	i__Entree,
@@ -389,5 +403,6 @@ liste_insts = [
 	i_Somme4,
 	#
 	i_Y,
-	i_Y_canalisation
+	i_Y_canalisation,
+	i_Y_union_2
 ]
