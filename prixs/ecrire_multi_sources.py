@@ -38,6 +38,8 @@ def lire_une_source(source):
 		#
 	return infos, NOM
 
+#python3 prixs/ecrire_multi_sources.py prixs/BTC.csv prixs/bitgetBTCUSDT.csv ...
+
 if __name__ == "__main__":
 	from sys import argv
 
@@ -46,7 +48,7 @@ if __name__ == "__main__":
 	sources_lignes = [lire_une_source(source) for source in sources]
 
 	sorties = {
-		f'{NOM}/{nom_extraction}.bin' : bruit_pro_normalisant(exctration(lignes))
+		f'prixs/{NOM}/{nom_extraction}.bin' : bruit_pro_normalisant(exctration(lignes))
 		for lignes,NOM in sources_lignes
 			for exctration, nom_extraction in [
 				(prixs,      'prixs'  ),
@@ -55,8 +57,7 @@ if __name__ == "__main__":
 				(median,     'median' ),
 				(volumes,    'volumes'),
 				(volumes_A,  'volumes_A'),
-				(volumes_U,  'volumes_U'),
-				(tradecount, 'tradecount'),
+				(volumes_U,  'volumes_U')
 		]
 	}
 

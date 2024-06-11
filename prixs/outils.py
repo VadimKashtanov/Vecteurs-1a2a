@@ -15,8 +15,9 @@ def macd(x, e):
 	ema9 = ema(__macd, 9*e)
 	return [a-b for a,b in zip(__macd, ema9)]
 
-def chiffre_haut(x, CHIFFRE):
-	pass
-
-def chiffre_bas(x, CHIFFRE):
-	pass
+def chiffre(x, __chiffre):
+	ret = []
+	for _x in x:
+		ch = (int(_x)%__chiffre)/__chiffre
+		ret += [2*(0.5 - (ch if ch <= 0.5 else 1-ch))]
+	return ret
