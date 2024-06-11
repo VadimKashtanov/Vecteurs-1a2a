@@ -134,6 +134,7 @@ void montrer_Y_du_model(Mdl_t * mdl, BTCUSDT_t * btcusdt) {
 
 int main() {
 	srand(time(NULL));
+	ecrire_structure_generale("structure_generale.bin");
 	verif_insts();
 
 	//	=========================================================
@@ -184,8 +185,8 @@ int main() {
 		printf(" === Echope %i ===\n", e);
 		
 		//
-		uint I = 50;//300;
-		uint tous_les = 10;
+		uint I        = 100;
+		uint tous_les =  20;
 		
 		//
 		srand(time(NULL));
@@ -195,7 +196,7 @@ int main() {
 		uint * ts__d = cpu_vers_gpu<uint>(ts, GRAND_T);
 
 		//
-		opti(mdl, btcusdt, ts__d, I, tous_les, ADAM, 5e-4);
+		opti(mdl, btcusdt, ts__d, I, tous_les, ADAM, 5e-3);
 		ecrire_mdl("mdl.bin", mdl);
 
 		if (e % 10 == 0) {
@@ -217,3 +218,26 @@ int main() {
 	//liberer_mdl    (mdl    );
 	//liberer_btcusdt(btcusdt);
 };
+
+
+
+
+
+
+/*
+Bon parametres:
+
+6 juin 2024 = grand=10*16, mega_t=24, alpha=5e-4, I=50, L2=0.0, K=(sng==sng ? 0.25 : 2.0)
+
+7 juin 2024 :
+	grand_t = 3*16
+	mega_t  = 24
+	alpha = 5e-4
+	I = 40
+	L2=0.0
+	K=(0.25 : 2.0)
+	model = N=8 max_interv=256
+		kconvl_lstm+pool -> chaine x10                   -> chaine -> x10
+					-> kconvl_lstm+pool -> chaine -> x10 ->
+
+*/

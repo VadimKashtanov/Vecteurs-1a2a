@@ -31,7 +31,7 @@ void matmul1d_canal__init_poids(Inst_t * inst) {
 	uint v_y = inst->Y / C1;
 	//
 	float p[inst->P];
-	FOR(0, i, inst->P) p[i] = sqrtf( 6.0 / (float)(v_x*C0/M)) * (2*rnd()-1);
+	FOR(0, i, inst->P) p[i] = sqrtf( 6.0 / (float)(v_x*C0/M)) * poid_1_1();
 	//
 	CONTROLE_CUDA(cudaMemcpy(inst->p__d, p, sizeof(float)*inst->P, cudaMemcpyHostToDevice));
 };

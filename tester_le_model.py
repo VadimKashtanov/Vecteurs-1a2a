@@ -20,8 +20,8 @@ requette_bitget = lambda de, a, SYMBOLE: eval(
 HEURES_PAR_REQUETTE = 100
 
 T = (30)*24
-N = 4#8
-INTERVALLE_MAX = 128
+N = 8
+INTERVALLE_MAX = 256
 DEPART = INTERVALLE_MAX * N
 
 HEURES = DEPART + T
@@ -73,16 +73,28 @@ system(f"./prog_tester_le_mdl")
 
 import struct as st
 
+with open("structure_generale.bin", 'rb') as co:
+	bins = co.read()
+	(I,) = st.unpack('I', bins[:4])
+	elements = st.unpack('I', bins[4:])
+	#
+	MEGA_T, = elements
+
 with open("les_predictions.bin", 'rb') as co:
 	bins = co.read()
-	I = int( int(len(bins)/4) / 2)
-	les_predictions = st.unpack('f'*I, bins[:4*I])
-	les_delats      = st.unpack('f'*I, bins[4*I:])
+	I = int( int(len(bins)/4) / 3)
+	les_Amplitudes  = st.unpack('f'*I, bins[0*4*I:1*4*I])
+	les_predictions = st.unpack('f'*I, bins[1*4*I:2*4*I])
+	les_delats      = st.unpack('f'*I, bins[2*4*I:3*4*I])
+
+print("les_Amplitudes ", les_Amplitudes [-5:])
+print("les_predictions", les_predictions[-5:])
+print("les_delats     ", les_delats     [-5:])
 
 deltas = [(prixs[i+1]/prixs[i] - 1) for i in range(len(prixs)-1)]
 
-print(les_delats[-5:])
-print(deltas    [-5:])
+print("les delats", les_delats[-5:])
+print("deltas    ", deltas    [-5:])
 
 #breakpoint()
 
@@ -92,17 +104,24 @@ def normer(l):
 
 import matplotlib.pyplot as plt
 
-a = normer(les_predictions)
-b = normer(prixs[-len(les_predictions):-1])
+a = normer(les_Amplitudes )
+b = normer(les_predictions)
+c = normer(prixs[-len(les_predictions)-1:-1])
 
-plt.plot(a, 'x')
-plt.plot(b     )
+for i in range(int(len(les_predictions)/MEGA_T)):
+	plt.plot([len(les_predictions) - i*MEGA_T]*2, [0, 1])
+
+plt.plot(a, 'o')
+plt.plot(b, 'x')
+plt.plot(c     )
 plt.show()
 
-print(len(les_predictions))
-print(len(prixs))
+print("len(les_predictions)", len(les_predictions))
+print("len(prixs)          ", len(prixs))
 
-fig, ax = plt.subplots(2)
+fig, ax = plt.subplots(3,2)
+
+__sng = lambda x: (1 if x > 0 else -1)
 
 signe = [+1,-1]
 
@@ -113,11 +132,40 @@ for sng in [0,1]:
 		for i in range(len(les_predictions)):
 			p0 = (len(prixs)-1-len(les_predictions)) + i    
 			p1 = (len(prixs)-1-len(les_predictions)) + i + 1
-			u += u * L * les_predictions[i-1] * (prixs[p1]/prixs[p0]-1) * signe[sng]
+			u += u * L * __sng(les_predictions[i]) * (prixs[p1]/prixs[p0]-1) * signe[sng]
 			_u0 += [u]
 			if u < 0: u = 0
 		#
-		ax[sng].plot(_u0, label=f'{signe[sng]}x{L}')
+		ax[0][sng].plot(_u0, label=f'{signe[sng]}x{L} * sng()')
+		ax[0][sng].legend()
+#
+for sng in [0,1]:
+	for L in (10, 50, 100):
+		u = 100
+		_u0 = [u]
+		for i in range(len(les_predictions)):
+			p0 = (len(prixs)-1-len(les_predictions)) + i    
+			p1 = (len(prixs)-1-len(les_predictions)) + i + 1
+			u += u * L * les_predictions[i] * (prixs[p1]/prixs[p0]-1) * signe[sng]
+			_u0 += [u]
+			if u < 0: u = 0
+		#
+		ax[1][sng].plot(_u0, label=f'{signe[sng]}x{L}')
+		ax[1][sng].legend()
+	#
+for sng in [0,1]:
+	for L in (10, 50, 100):
+		u = 100
+		_u0 = [u]
+		for i in range(len(les_predictions)):
+			p0 = (len(prixs)-1-len(les_predictions)) + i    
+			p1 = (len(prixs)-1-len(les_predictions)) + i + 1
+			u += u * L * __sng(les_predictions[i]) * abs(les_Amplitudes[i]) * (prixs[p1]/prixs[p0]-1) * signe[sng]
+			_u0 += [u]
+			if u < 0: u = 0
+		#
+		ax[2][sng].plot(_u0, label=f'{signe[sng]}x{L} (Amplitude)')
+		ax[2][sng].legend()
 	#
 #
 plt.legend()

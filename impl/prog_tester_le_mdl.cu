@@ -45,6 +45,7 @@ static float ** toutes_les_predictions(Mdl_t * mdl, BTCUSDT_t * btcusdt) {
 	//
 	//uint partie_non_couverte = btcusdt->T - T*MEGA_T*GRAND_T;
 	//
+	float * les_Amplitudes  = alloc<float>(PREDS);
 	float * les_predictions = alloc<float>(PREDS);
 	float * les_deltas      = alloc<float>(PREDS);
 	//
@@ -65,13 +66,14 @@ static float ** toutes_les_predictions(Mdl_t * mdl, BTCUSDT_t * btcusdt) {
 		//
 		cudafree<uint>(ts__d);
 		//
-		float * y = gpu_vers_cpu<float>(mdl->inst[mdl->la_sortie]->y__d, GRAND_T*MEGA_T*btcusdt->Y);
+		float * y = gpu_vers_cpu<float>(mdl->inst[mdl->la_sortie]->y__d, GRAND_T*MEGA_T*(btcusdt->Y+1));
 		//
 		if (mode == 0) {
 			FOR(0, t, GRAND_T) {
 				FOR(0, mega_t, MEGA_T) {
-					les_predictions[lp]  = y[t*MEGA_T*btcusdt->Y + mega_t*btcusdt->Y + 0];
-					les_deltas[lp] = lire(btcusdt->sorties__d, (ts[t] + mega_t)*btcusdt->Y+0);
+					les_Amplitudes [lp]  = y[t*MEGA_T*(btcusdt->Y+1) + mega_t*(btcusdt->Y+1) + 0];
+					les_predictions[lp]  = y[t*MEGA_T*(btcusdt->Y+1) + mega_t*(btcusdt->Y+1) + 1];
+					les_deltas     [lp] = lire(btcusdt->sorties__d, (ts[t] + mega_t)*btcusdt->Y+0);
 					if ((ts[t] + mega_t) >= btcusdt->T-1) MSG("(ts[t] + mega_t) == btcusdt->T-1\n");
 					lp++;
 				}
@@ -79,8 +81,9 @@ static float ** toutes_les_predictions(Mdl_t * mdl, BTCUSDT_t * btcusdt) {
 		} else {
 			uint t = 0;
 			FOR(0, mega_t, MEGA_T) {
-				les_predictions[lp]  = y[t*MEGA_T*btcusdt->Y + mega_t*btcusdt->Y + 0];
-				les_deltas[lp] = lire(btcusdt->sorties__d, (ts[t] + mega_t)*btcusdt->Y+0);
+				les_Amplitudes [lp]  = y[t*MEGA_T*(btcusdt->Y+1) + mega_t*(btcusdt->Y+1) + 0];
+				les_predictions[lp]  = y[t*MEGA_T*(btcusdt->Y+1) + mega_t*(btcusdt->Y+1) + 1];
+				les_deltas     [lp] = lire(btcusdt->sorties__d, (ts[t] + mega_t)*btcusdt->Y+0);
 				if ((ts[t] + mega_t) >= btcusdt->T-1) MSG("(ts[t] + mega_t) == btcusdt->T-1\n");
 				lp++;
 			}
@@ -89,9 +92,10 @@ static float ** toutes_les_predictions(Mdl_t * mdl, BTCUSDT_t * btcusdt) {
 		free(y);
 	};
 	//
-	float ** ret = alloc<float*>(2);
-	ret[0] = les_predictions;
-	ret[1] = les_deltas     ;
+	float ** ret = alloc<float*>(3);
+	ret[0] = les_Amplitudes ;
+	ret[1] = les_predictions;
+	ret[2] = les_deltas     ;
 	return ret;
 };
 
@@ -115,8 +119,9 @@ int main() {
 	//tester_le_model(mdl, btcusdt);
 
 	float ** __lp = toutes_les_predictions(mdl, btcusdt);
-	float * lp = __lp[0];
-	float * dl = __lp[1];
+	float * A  = __lp[0];
+	float * lp = __lp[1];
+	float * dl = __lp[2];
 
 	FILE * fp = FOPEN("les_predictions.bin", "wb");
 	//
@@ -136,6 +141,9 @@ int main() {
 		//
 		PREDS = T * (GRAND_T * MEGA_T);
 	}
+	//
+	FWRITE(A, sizeof(float), PREDS, fp);	//les prédictions
+	free(A);
 	//
 	FWRITE(lp, sizeof(float), PREDS, fp);	//les prédictions
 	free(lp);

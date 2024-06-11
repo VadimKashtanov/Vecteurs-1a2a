@@ -34,7 +34,7 @@ void kconvl1d_stricte__init_poids(Inst_t * inst) {
 	//
 	float p[inst->P];
 	uint X=inst->x_Y[0], Y=inst->Y;
-	FOR(0, i, inst->P) p[i] = (1.0/(float)C0) * (2*rnd()-1);
+	FOR(0, i, inst->P) p[i] = (1.0/(float)C0) * poid_1_1();
 
 	CONTROLE_CUDA(cudaMemcpy(inst->p__d, p, sizeof(float)*inst->P, cudaMemcpyHostToDevice));
 };

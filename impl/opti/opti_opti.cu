@@ -39,7 +39,7 @@ void opti(
 			float s = mdl_S(mdl, btcusdt, ts__d);
 			float * p0 = mdl_pourcent(mdl, btcusdt, ts__d, 0.0);
 			float * p1 = mdl_pourcent(mdl, btcusdt, ts__d, 1.0);
-			float * p8 = mdl_pourcent(mdl, btcusdt, ts__d, 8.0);
+			float * p8 = mdl_pourcent(mdl, btcusdt, ts__d, 4.0);
 			//
 
 			printf("%3.i/%3.i score = %f (", i, I, s);
@@ -52,7 +52,7 @@ void opti(
 			FOR(0, p, btcusdt->Y) printf("\033[96m%f%%\033[0m ", p1[p]);
 			printf("}  ");
 
-			printf("^8:{");
+			printf("^4:{");
 			FOR(0, p, btcusdt->Y) printf("\033[96m%f%%\033[0m ", p8[p]);
 			printf("}");
 

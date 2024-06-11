@@ -31,6 +31,7 @@
 //
 #include "insts/Y.cuh"
 #include "insts/Y_canalisation.cuh"
+#include "insts/Y_union_2.cuh"
 
 uint inst_Xs[INSTS] = {
 	_entree__Xs,
@@ -51,7 +52,8 @@ uint inst_Xs[INSTS] = {
 	somme3__Xs,
 	somme4__Xs,
 	Y__Xs,
-	Y_canalisation__Xs
+	Y_canalisation__Xs,
+	Y_union_2__Xs
 };
 
 uint inst_PARAMS[INSTS] = {
@@ -73,7 +75,8 @@ uint inst_PARAMS[INSTS] = {
 	somme3__PARAMS,
 	somme4__PARAMS,
 	Y__PARAMS,
-	Y_canalisation__PARAMS
+	Y_canalisation__PARAMS,
+	Y_union_2__PARAMS
 };
 
 dimention_f calculer_P[INSTS] = {
@@ -96,6 +99,7 @@ dimention_f calculer_P[INSTS] = {
 	somme4__calculer_P,
 	Y__calculer_P,
 	Y_canalisation__calculer_P,
+	Y_union_2__calculer_P
 };
 
 dimention_f calculer_L[INSTS] = {
@@ -117,7 +121,8 @@ dimention_f calculer_L[INSTS] = {
 	somme3__calculer_L,
 	somme4__calculer_L,
 	Y__calculer_L,
-	Y_canalisation__calculer_L
+	Y_canalisation__calculer_L,
+	Y_union_2__calculer_L
 };
 
 inst__f_f __f_inst[INSTS] = {
@@ -139,7 +144,8 @@ inst__f_f __f_inst[INSTS] = {
 	somme3__f,
 	somme4__f,
 	Y__f,
-	Y_canalisation__f
+	Y_canalisation__f,
+	Y_union_2__f
 };
 
 inst_df_f _df_inst[INSTS] = {
@@ -161,7 +167,8 @@ inst_df_f _df_inst[INSTS] = {
 	somme3__df,
 	somme4__df,
 	Y__df,
-	Y_canalisation__df
+	Y_canalisation__df,
+	Y_union_2__df
 };
 
 inst_f init_poids[INSTS] = {
@@ -183,7 +190,8 @@ inst_f init_poids[INSTS] = {
 	somme3__init_poids,
 	somme4__init_poids,
 	Y__init_poids,
-	Y_canalisation__init_poids
+	Y_canalisation__init_poids,
+	Y_union_2__init_poids
 };
 
 const char * inst_Nom[INSTS] = {
@@ -205,7 +213,8 @@ const char * inst_Nom[INSTS] = {
 	somme3_nom,
 	somme4_nom,
 	Y_nom,
-	Y_canalisation_nom
+	Y_canalisation_nom,
+	Y_union_2_nom
 };
 
 static Inst_t * lire_tete_instruction(FILE * fp) {

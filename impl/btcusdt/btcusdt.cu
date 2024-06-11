@@ -20,6 +20,9 @@ BTCUSDT_t * cree_btcusdt(char * fichier) {
 	//
 	ret->X = N * LIGNES;
 	ret->Y = P;
+	//
+	ret->P = P;
+	ret->A = 1;
 
 	//
 	float * x = alloc<float>(ret->T * ret->X);

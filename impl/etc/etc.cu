@@ -16,6 +16,13 @@ float rnd()
 	return (float)(rand() % PROFONDEURE) / (float)PROFONDEURE;
 }
 
+float poid_1_1() {
+	float amplitude = 1;//tanh(5*rnd());//powf(2.0, rnd())-1.0;
+	float vecteur   = 2*rnd()-1;
+	//
+	return amplitude * vecteur;
+};
+
 float signe(float x)
 {
 	return (x>=0 ? 1:-1);

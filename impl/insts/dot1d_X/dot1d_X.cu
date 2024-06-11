@@ -33,7 +33,7 @@ void dot1d_X__init_poids(Inst_t * inst) {
 	//
 	float p[inst->P];
 	uint X=inst->x_Y[0], Y=inst->Y;
-	FOR(0, i, inst->P) p[i] = sqrtf( 6.0 / (float)(v_x0)) * (2*rnd()-1);
+	FOR(0, i, inst->P) p[i] = sqrtf( 6.0 / (float)(v_x0)) * poid_1_1();
 
 	CONTROLE_CUDA(cudaMemcpy(inst->p__d, p, sizeof(float)*inst->P, cudaMemcpyHostToDevice));
 };

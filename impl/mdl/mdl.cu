@@ -84,5 +84,5 @@ void mdl_verif(Mdl_t * mdl, BTCUSDT_t * btcusdt) {
 			};
 		}
 	}
-	ASSERT(btcusdt->Y == mdl->inst[mdl->la_sortie]->Y);
+	ASSERT((btcusdt->Y+1) == mdl->inst[mdl->la_sortie]->Y);
 };

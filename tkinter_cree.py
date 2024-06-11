@@ -558,7 +558,14 @@ class DraggableApp(tk.Tk):
 			#
 			for f in self.frames:
 				f.mettre_a_jour_module()
-				co.write(st.pack('III', modules_models.index(type(f.module)), f.winfo_x(), f.winfo_y()))
+				try:
+					co.write(st.pack('III', modules_models.index(type(f.module)), f.winfo_x(), f.winfo_y()))
+				except:
+					print("TraceBack")
+					print("co.write(st.pack('III', modules_models.index(type(f.module)), f.winfo_x(), f.winfo_y()))")
+					print("struct.error: argument out of range")
+					print("Valeurs :", modules_models.index(type(f.module)), f.winfo_x(), f.winfo_y())
+					return
 				co.write(st.pack('I'*len(f.module.X), *f.module.X))
 				co.write(st.pack('I'*len(f.module.Y), *f.module.Y))
 				co.write(st.pack('I'*len(f.module.params), *list(f.module.params.values())))
@@ -580,7 +587,12 @@ class DraggableApp(tk.Tk):
 			f.mettre_a_jour_module()
 			m = f.module
 			#
-			m.cree_ix()
+			try:
+				m.cree_ix()
+			except Exception as e:
+				print(f"Erreur dans frame={f.numero}, module : {m}")
+				raise e
+			#
 			for i in range(len(m.ix)):
 				#print(m.ix[i])
 				assert all(m.ix[i]['x'][j] in m.ix or m.ix[i]['x'][j] == None for j in range(len(m.ix[i]['x'])))

@@ -94,6 +94,10 @@ nvcc -c impl/insts/Y/Y_df.cu ${A} &
 nvcc -c impl/insts/Y_canalisation/Y_canalisation.cu ${A} &
 nvcc -c impl/insts/Y_canalisation/Y_canalisation_f.cu ${A} &
 nvcc -c impl/insts/Y_canalisation/Y_canalisation_df.cu ${A} &
+#	/insts/Y_union_2
+nvcc -c impl/insts/Y_union_2/Y_union_2.cu ${A} &
+nvcc -c impl/insts/Y_union_2/Y_union_2_f.cu ${A} &
+nvcc -c impl/insts/Y_union_2/Y_union_2_df.cu ${A} &
 ###########
 #	/etc
 nvcc -c impl/etc/etc.cu     ${A} &
@@ -104,6 +108,7 @@ nvcc -c impl/btcusdt/btcusdt_df.cu       ${A} &
 nvcc -c impl/btcusdt/btcusdt_pourcent.cu ${A} &
 #	/main
 nvcc -c impl/main/verif_1e5.cu    ${A} &
+nvcc -c impl/main/structure.cu    ${A} &
 #	/mdl
 nvcc -c impl/mdl/mdl.cu ${A} &
 nvcc -c impl/mdl/mdl_optimisation.cu    ${A} &
@@ -128,6 +133,11 @@ wait
 #	Programme : "principale"
 nvcc     -c impl/main.cu ${A}
 nvcc *.o -o      main    ${A}
+rm main.o
+#	Programme : "tester le model"
+nvcc     -c impl/prog_tester_le_mdl.cu ${A}
+nvcc *.o -o      prog_tester_le_mdl    ${A}
+rm prog_tester_le_mdl.o
 #
 #	Attente de terminaison des differents fils de compilation
 #
