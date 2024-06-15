@@ -199,7 +199,8 @@ class DraggableApp(tk.Tk):
 		self.frames = []
 		self.canvas = LineCanvas(
 			self,
-			width=1510, height=1135,
+			width=1460, height=1135,
+			#width=1510, height=1135,
 			scrollregion=(0, 0, 1900, 2000),
 			bg=rgb(240,240,240),
 		)
@@ -219,13 +220,14 @@ class DraggableApp(tk.Tk):
 			tk.Button(modules_instruction, text=f'{m.nom}', command=lambda _m=m:self.add_frame(_m())).grid(row=i_m//2, column=i_m%2, sticky='nsew')
 		modules_instruction.pack(fill=tk.BOTH, expand=True)
 		#
+		#
 		modules_normaux = tk.Frame(ajout_module)
 		for i_m in range(len(modules_inst), len(modules_models)): #modules_models:
 			m = modules_models[i_m]
-			tk.Button(modules_normaux, text=f'{m.nom}', command=lambda _m=m:self.add_frame(_m())).pack(fill=tk.X)
+			tk.Button(modules_normaux, text=f'{m.nom}', command=lambda _m=m:self.add_frame(_m())).grid(row=i_m//2, column=i_m%2, sticky='nsew')#.pack(fill=tk.X)
 		modules_normaux.pack(fill=tk.BOTH, expand=True)
 
-		ajout_module.pack(fill=tk.Y, expand=True)
+		ajout_module.pack(fill=tk.BOTH, expand=True)
 
 		#	-------------------------
 
@@ -244,6 +246,7 @@ class DraggableApp(tk.Tk):
 		arrow_right_img = tk.PhotoImage(file="tkinter_cree_dossier/arrow_right.png")
 
 		# Create arrow buttons
+		self.x, self.y = 0, 0
 		move_up_btn    = tk.Button(self.fleches_frame, image=arrow_up_img,    command=self.move_objects_up   )
 		move_up_btn.grid   (row=0, column=1)
 		move_down_btn  = tk.Button(self.fleches_frame, image=arrow_down_img,  command=self.move_objects_down )
@@ -312,16 +315,10 @@ class DraggableApp(tk.Tk):
 		sortie_frame = tk.LabelFrame(self.frame_boutons, text='La Sortie Model')
 		self.vraie_sortie = 0
 		self.la_sortie = Entree(sortie_frame, 'Sortie du Modele : ', '0')
-		self.la_sortie.pack(fill=tk.BOTH, expand=True)
-		tk.Button(sortie_frame, text='Appliquer', command=self.mise_a_jour_sortie).pack(fill=tk.BOTH, expand=True)
+		self.la_sortie.grid(row=0, column=0, sticky='nsew')
+		tk.Button(sortie_frame, text='Appliquer', command=self.mise_a_jour_sortie).grid(row=0, column=1, sticky='nsew')
 
 		sortie_frame.pack(fill=tk.BOTH, expand=True)
-
-		#	--------------------- Reorganisation ------------------------
-
-		re_orga = tk.LabelFrame(self.frame_boutons, text="Reorganiser")
-		tk.Button(re_orga, text="Re ordonner", command=self.re_ordonner_frames).pack(fill=tk.X, expand=True)
-		re_orga.pack(fill=tk.BOTH, expand=True)
 
 		#	-------------- Fichier Enregistrer / Ouvire -----------------
 
@@ -419,28 +416,33 @@ class DraggableApp(tk.Tk):
 
 	def mise_a_jour_sortie(self):
 		self.vraie_sortie = eval(self.la_sortie.val.get())
+		self.re_ordonner_frames()
 
 	#	========================================================================
 
 	def move_objects_up(self):
+		self.y -= 1
 		for frame in self.frames:
 			frame.place_configure(y=frame.winfo_y() - -400)
 		self.canvas.update()
 		self.canvas.update_lines()
 
 	def move_objects_down(self):
+		self.y += 1
 		for frame in self.frames:
 			frame.place_configure(y=frame.winfo_y() + -400)
 		self.canvas.update()
 		self.canvas.update_lines()
 
 	def move_objects_left(self):
+		self.x -= 1
 		for frame in self.frames:
 			frame.place_configure(x=frame.winfo_x() - -400)
 		self.canvas.update()
 		self.canvas.update_lines()
 
 	def move_objects_right(self):
+		self.x += 1
 		for frame in self.frames:
 			frame.place_configure(x=frame.winfo_x() + -400)
 		self.canvas.update()
@@ -501,6 +503,7 @@ class DraggableApp(tk.Tk):
 	# ========================================================================
 
 	def ouvrire(self, event=None):
+		self.x, self.y = 0, 0
 		#
 		fichier = filedialog.askopenfilename(filetypes = (('module', '*.module'), ('Tous les fichier', '*.*')))
 		#
@@ -548,6 +551,16 @@ class DraggableApp(tk.Tk):
 		self.canvas.update_lines()
 
 	def sauvgarder(self, event=None):
+		x, y = self.x, self.y
+		for i in range(abs(x)):
+			if x > 0 : self.move_objects_left ()
+			else     : self.move_objects_right()
+		for i in range(abs(y)):
+			if y > 0 : self.move_objects_up ()
+			else     : self.move_objects_down()
+		self.x = 0
+		self.y = 0
+		#
 		fichier = filedialog.asksaveasfilename(filetypes = (('module', '*.module'), ('Tous les fichier', '*.*')))
 		#
 		with open(fichier, 'wb') as co:

@@ -11,6 +11,16 @@ static __device__ float cuda_signe(float x) {
 	else return -1;
 }
 
+
+//  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+template <typename T>
+static T max_lst(T * l, uint I) {
+	T _max  = l[0];
+	FOR(1, i, I) if (_max < l[i]) _max = l[i];
+	return _max;
+};
+
 //  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 template <typename T>

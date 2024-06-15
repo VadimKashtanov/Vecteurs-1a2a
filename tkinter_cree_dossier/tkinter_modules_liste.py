@@ -3,21 +3,22 @@ from tkinter_cree_dossier.tkinter_dico_inst import Dico
 
 from tkinter_cree_dossier.tkinter_insts import i__Entree
 from tkinter_cree_dossier.tkinter_insts import i_Activation
-from tkinter_cree_dossier.tkinter_insts import i_Biais
+from tkinter_cree_dossier.tkinter_insts import i_Biais, i_Const
 from tkinter_cree_dossier.tkinter_insts import i_Dot1d_X, i_Dot1d_XY
-from tkinter_cree_dossier.tkinter_insts import i_Kconvl1d_stricte, i_Kconvl2d_stricte
+from tkinter_cree_dossier.tkinter_insts import i_Kconvl1d, i_Kconvl1d_stricte, i_Kconvl2d_stricte
 from tkinter_cree_dossier.tkinter_insts import i_MatMul, i_MatMul_Canal
 from tkinter_cree_dossier.tkinter_insts import i_Mul2, i_Mul3
 from tkinter_cree_dossier.tkinter_insts import i_Pool2_1d, i_Pool2x2_2d
 from tkinter_cree_dossier.tkinter_insts import i_Softmax
 from tkinter_cree_dossier.tkinter_insts import i_Somme2, i_Somme3, i_Somme4
+from tkinter_cree_dossier.tkinter_insts import i_Sub2
 from tkinter_cree_dossier.tkinter_insts import i_Y, i_Y_canalisation, i_Y_union_2
 
 from tkinter_cree_dossier.tkinter_modules_inst_liste import *
 
 conn = lambda sortie,inst,entree: (sortie, (inst,entree))
 
-#	======================================================================
+######################################################################
 
 class CHAINE_N_DOT1D(Module_Mdl):
 	nom = "Chaine Dot1d"
@@ -74,7 +75,7 @@ class CHAINE_N_DOT1D_RECURENTE(Module_Mdl):
 		Y = self.Y[0]
 
 		assert H>0
-		assert N>1
+		assert N>0
 
 		#	------------------
 
@@ -97,7 +98,116 @@ class CHAINE_N_DOT1D_RECURENTE(Module_Mdl):
 
 		return self.ix
 
+class DOT1D_RECURENTE_N_PROFOND(Module_Mdl):
+	nom = "DOT1D RECCURENT N PROFOND"
+	X, Y = [0], [0]
+	X_noms, Y_noms = ["X"], ["H"] # LSTM [X], [H]
+	params = {
+		'N' : 1,
+		'activ' : 0
+	}
+	def cree_ix(self):
+		#	Params
+		X = self.X[0]
+		Y = self.Y[0]
+		#
+		N = self.params['N']
+		activ = self.params['activ']
+		#
+		self.elements = {
+			'n_x'        : CHAINE_N_DOT1D(X=[X], Y=[X], params={'C0':1,'activ':activ}).cree_ix(),
+			'n_recurent' : CHAINE_N_DOT1D(X=[Y], Y=[Y], params={'C0':1,'activ':activ}).cree_ix(),
+			'XY' : MODULE_i_Dot1d_XY(X=[X,Y], params={'C0':1, 'activ':activ}).cree_ix(),
+		}
+		self.connections = {
+			'n_x' : {
+				0 : None
+			},
+			'n_recurent' : {
+				0 : ('XY', -1),
+			},
+			'XY' : {
+				0 : ('n_x', 0),
+				1 : ('n_recurent', 0)
+			}
+		}
+		self.cree_elements_connections()
+		return self.ix
+
+class CHAINE_N_DOT1D_RECURENTE_N_PROFONDE(Module_Mdl):
+	nom = "CHAINE DOT1D RECC N"
+	X, Y = [0], [0]
+	X_noms, Y_noms = ["X"], ["H"] # LSTM [X], [H]
+	params = {
+		#'activ' : 0
+		'N' : 1,
+		'N_rec' : 1,
+		'H' : 0
+	}
+	def cree_ix(self):
+		#	Params
+		X = self.X[0]
+		Y = self.Y[0]
+		#
+		N = self.params['N']
+		N_rec = self.params['N_rec']
+		H = self.params['H']
+
+		#	------------------
+
+		_tanh      = 0
+		logistique = 1
+
+		self.elements = {}
+		self.connections = {}
+		#
+		self.elements   ['0'] = DOT1D_RECURENTE_N_PROFOND(X=[X], Y=[H], params={'N':N_rec, 'activ':0}).cree_ix()
+		self.connections['0'] = {0:None}
+		#
+		for i in range(1,N-1):
+			self.elements   [str(i)] = DOT1D_RECURENTE_N_PROFOND(X=[H], Y=[H], params={'N':N_rec, 'activ':0}).cree_ix()
+			self.connections[str(i)] = {0:(str(i-1), 0)}
+		#
+		self.elements   [str(N-1)] = DOT1D_RECURENTE_N_PROFOND(X=[H], Y=[Y], params={'N':N_rec, 'activ':0}).cree_ix()
+		self.connections[str(N-1)] = {0:(str(N-1-1), 0)}
+
+		self.cree_elements_connections()
+		return self.ix
+
 ############################################
+
+class KCONVL_RELU(Module_Mdl):	#	f(ax0+bx1+cx2+d)
+	nom = "Kconvl + Relu"
+	X, Y = [0], [0]
+	X_noms, Y_noms = ["X"], ["Y"] # LSTM [X], [H]
+	params = {
+		'K' : 3,
+		'C0' : 1,
+		'C1' : 1,
+		'im_X' : 0,
+		'im_Y' : 0
+	}
+	def cree_ix(self):
+		#	Params
+		K    = self.params['K'   ]
+		C0   = self.params['C0'  ]
+		C1   = self.params['C1'  ]
+		im_X = self.params['im_X']
+		im_Y = self.params['im_Y']
+		#
+		X = self.X[0]
+		Y = self.Y[0]
+		#
+		#	------------------
+
+		self.ix = [
+			a:=Dico(i=i_Kconvl1d,   X=[X], x=[None], xt=[None], y=Y, p=[K,C0,C1,im_X,im_Y], sortie=False),
+			b:=Dico(i=i_Activation, X=[Y], x=[a],    xt=[0],    y=Y, p=[3], sortie=True),
+		]
+
+		return self.ix
+
+#################################################
 
 class GRILLE_XY_DOT1D(Module_Mdl):
 	nom = "Grille XY dot1d"
@@ -369,7 +479,7 @@ class MEMOIRE_TANACHIQUE_IxI(Module_Mdl):
 #	======================================================================
 
 class DOT1D_1(Module_Mdl):	#	f(ax0+bx1+cx2+d)
-	nom = "DOT1D_3 : f(AX0+BX1+CX2+D)"
+	nom = "DOT1D X 1"
 	X, Y = [0], [0]
 	X_noms, Y_noms = ["X0"], ["Y"] # LSTM [X], [H]
 	params = {
@@ -394,7 +504,7 @@ class DOT1D_1(Module_Mdl):	#	f(ax0+bx1+cx2+d)
 		return self.ix
 
 class DOT1D_2(Module_Mdl):	#	f(ax0+bx1+cx2+d)
-	nom = "DOT1D_2 : f(AX0+BX1+C)"
+	nom = "DOT1D XY 2"
 	X, Y = [0,0], [0]
 	X_noms, Y_noms = ["X0","X1"], ["Y"] # LSTM [X], [H]
 	params = {
@@ -421,7 +531,7 @@ class DOT1D_2(Module_Mdl):	#	f(ax0+bx1+cx2+d)
 		return self.ix
 
 class DOT1D_3(Module_Mdl):	#	f(ax0+bx1+cx2+d)
-	nom = "DOT1D_3 : f(AX0+BX1+CX2+D)"
+	nom = "DOT1D XYZ 3"
 	X, Y = [0,0,0], [0]
 	X_noms, Y_noms = ["X0","X1","X2"], ["Y"] # LSTM [X], [H]
 	params = {
@@ -449,7 +559,7 @@ class DOT1D_3(Module_Mdl):	#	f(ax0+bx1+cx2+d)
 
 		return self.ix
 
-class AB_fois_CD(Module_Mdl):
+class AB_plus_CD(Module_Mdl):
 	nom = "A*B + C*D"
 	X, Y = [0,0,0,0], [0]
 	X_noms, Y_noms = ["A","B","C","D"], ["Y"] # LSTM [X], [H]
@@ -503,7 +613,7 @@ class LSTM1D(Module_Mdl):	#	f(ax0+bx1+cx2+d)
 			#u =       tanh(sU = Ux@x + Uh@h[-1] +          + Ub)
 			'u' : DOT1D_2(X=[X,Y], Y=[Y], params={'activ':_tanh}).cree_ix(),
 			#c = f*c[-1] + i*u
-			'c' : AB_fois_CD(X=[Y,Y,Y,Y], Y=[Y], params={}).cree_ix(),
+			'c' : AB_plus_CD(X=[Y,Y,Y,Y], Y=[Y], params={}).cree_ix(),
 			#ch = tanh(c)
 			'ch' : MODULE_i_Activation(X=[Y], Y=[Y], params={'activ':_tanh}).cree_ix(),
 			#o = logistique(sO = Ox@x + Oh@h[-1] + Oc@c    + Ob)
@@ -551,6 +661,42 @@ class LSTM1D(Module_Mdl):	#	f(ax0+bx1+cx2+d)
 				1 : ('ch', 0)
 			}
 		}
+
+		self.cree_elements_connections()
+		return self.ix
+
+class CHAINE_N_LSTM(Module_Mdl):
+	nom = "Chaine LSTM"
+	X, Y = [0], [0]
+	X_noms, Y_noms = ["X"], ["Y"] # LSTM [X], [H]
+	params = {
+		'N' : 1,
+		'H' : 0
+	}
+	def cree_ix(self):
+		#	Params
+		N     = self.params[  'N'  ]
+		H     = self.params[  'H'  ]
+		X = self.X[0]
+		Y = self.Y[0]
+
+		assert N > 1
+		assert H > 1
+
+		#	------------------
+
+		self.elements = {}
+		self.connections = {}
+		#
+		self.elements   ['0'] = LSTM1D(X=[X], Y=[H], params={}).cree_ix()
+		self.connections['0'] = {0:None}
+		#
+		for i in range(1,N-1):
+			self.elements   [str(i)] = LSTM1D(X=[H], Y=[H], params={}).cree_ix()
+			self.connections[str(i)] = {0:(str(i-1), 0)}
+		#
+		self.elements   [str(N-1)] = LSTM1D(X=[H], Y=[Y], params={}).cree_ix()
+		self.connections[str(N-1)] = {0:(str(N-1-1), 0)}
 
 		self.cree_elements_connections()
 		return self.ix
@@ -668,7 +814,7 @@ class LSTM1D_PLUS_PROFOND(Module_Mdl):	#	f(ax0+bx1+cx2+d)
 			#u =       tanh(sU = Ux@x + Uh@h[-1] +          + Ub)
 			'u' : DOT1D_2_PRODONDE_CHAINE(X=[X,Y], Y=[Y], params={'N':N, 'activ_fin':_tanh}).cree_ix(),
 			#c = f*c[-1] + i*u
-			'c' : AB_fois_CD(X=[Y,Y,Y,Y], Y=[Y], params={}).cree_ix(),
+			'c' : AB_plus_CD(X=[Y,Y,Y,Y], Y=[Y], params={}).cree_ix(),
 			#ch = tanh(c)
 			'ch' : MODULE_i_Activation(X=[Y], Y=[Y], params={'activ':_tanh}).cree_ix(),
 			#o = logistique(sO = Ox@x + Oh@h[-1] + Oc@c    + Ob)
@@ -889,7 +1035,7 @@ class LSTM1D_CONVOLUTION(Module_Mdl):	#	f(ax0+bx1+cx2+d)
 			'u_a' : MODULE_i_Activation(X=[Y], Y=[Y], params={'activ':_tanh}).cree_ix(),
 			
 			#c = f*c[-1] + i*u
-			'c' : AB_fois_CD(X=[Y,Y,Y,Y], Y=[Y], params={}).cree_ix(),
+			'c' : AB_plus_CD(X=[Y,Y,Y,Y], Y=[Y], params={}).cree_ix(),
 			
 			#ch = tanh(c)
 			'ch' : MODULE_i_Activation(X=[Y], Y=[Y], params={'activ':_tanh}).cree_ix(),
@@ -1032,17 +1178,189 @@ class LSTM1D_PARRALLELE(Module_Mdl):	#	f(ax0+bx1+cx2+d)
 		self.cree_elements_connections()
 		return self.ix
 
+#	======================================================
+
+class GRU1D(Module_Mdl):	#	f(ax0+bx1+cx2+d)
+	nom = "GRU 1D"
+	X, Y = [0], [0]
+	X_noms, Y_noms = ["X"], ["H"] # LSTM [X], [H]
+	params = {
+		#
+	}
+	def cree_ix(self):
+		#	Params
+		X = self.X[0]
+		Y = self.Y[0]
+
+		#	------------------
+
+		_tanh      = 0
+		logistique = 1
+
+		self.elements = {
+			'x' : MODULE_i_Y(X=[X], Y=[X], params={}).cree_ix(),
+			#
+			'z' : DOT1D_2(X=[X,Y], Y=[Y], params={'activ':logistique}).cree_ix(),
+			'r' : DOT1D_2(X=[X,Y], Y=[Y], params={'activ':logistique}).cree_ix(),
+			#
+			'r*h' : MODULE_i_Mul2 (X=[Y,Y], Y=[Y], params={}).cree_ix(),
+			'ĥ'   : DOT1D_2(X=[X,Y], Y=[Y], params={'activ':_tanh}).cree_ix(),
+			#
+			'1'  : MODULE_i_Const(X=[], Y=[Y], params={'cst' : 1}).cree_ix(),
+			'(1-z)' : MODULE_i_Sub2(X=[Y,Y], Y=[Y], params={}).cree_ix(),
+			#
+			#(1-z)*h + z * ĥ
+			'h' : AB_plus_CD(X=[Y,Y,Y,Y], Y=[Y], params={}).cree_ix(),
+		}
+
+		#	======================
+
+		self.connections = {
+			'x' : {
+				0 : None,
+			},
+			'z' : {
+				0 : ('x', 0), 
+				1 : ('h', -1),
+			},
+			'r' : {
+				0 : ('x', 0), 
+				1 : ('h', -1),
+			},
+			'r*h' : {
+				0 : ('r', 0), 
+				1 : ('h', -1),
+			},
+			'ĥ' : {
+				0 : ('x', 0), 
+				1 : ('r*h', 0),
+			},
+			'1' : {},
+			'(1-z)' : {
+				0 : ('1', 0), 
+				1 : ('z', 0),
+			},
+			'h' : {
+				0 : ('(1-z)', 0),
+				1 : ('h', -1),
+				2 : ('z', 0),
+				3 : ('ĥ', 0)
+			}
+		}
+
+		self.cree_elements_connections()
+		return self.ix
+
+class CHAINE_GRU1D(Module_Mdl):	#	f(ax0+bx1+cx2+d)
+	nom = "Chaine GRU"
+	X, Y = [0], [0]
+	X_noms, Y_noms = ["X"], ["Y"] # LSTM [X], [H]
+	params = {
+		'N' : 1,
+		'H' : 0
+	}
+	def cree_ix(self):
+		#	Params
+		N     = self.params[  'N'  ]
+		H     = self.params[  'H'  ]
+		X = self.X[0]
+		Y = self.Y[0]
+
+		assert N > 1
+		assert H > 1
+
+		#	------------------
+
+		self.elements = {}
+		self.connections = {}
+		#
+		self.elements   ['0'] = GRU1D(X=[X], Y=[H], params={}).cree_ix()
+		self.connections['0'] = {0:None}
+		#
+		for i in range(1,N-1):
+			self.elements   [str(i)] = GRU1D(X=[H], Y=[H], params={}).cree_ix()
+			self.connections[str(i)] = {0:(str(i-1), 0)}
+		#
+		self.elements   [str(N-1)] = GRU1D(X=[H], Y=[Y], params={}).cree_ix()
+		self.connections[str(N-1)] = {0:(str(N-1-1), 0)}
+
+		self.cree_elements_connections()
+		return self.ix
+
+#	======================================================
+
+class SORTIE_SIMPLE(Module_Mdl):	#	f(ax0+bx1+cx2+d)
+	nom = "SORTIE SIMPLE"
+	X, Y = [0], [0]
+	X_noms, Y_noms = ["X"], ["Y"] # LSTM [X], [H]
+	params = {
+		'H' : 1,
+		'N' : 0
+	}
+	def cree_ix(self):
+		#	Params
+		N     = self.params[  'N'  ]
+		H     = self.params[  'H'  ]
+		X = self.X[0]
+		Y = self.Y[0]
+
+		assert N > 1
+		assert H > 1
+
+		#	------------------
+
+		self.elements = {
+			'x' : MODULE_i_Y(X=[X], Y=[X], params={}).cree_ix(),
+
+			'A' : CHAINE_N_DOT1D(X=[X], Y=[1], params={})
+			'P' :
+		}
+		self.connections = {
+			'x' : {0:None},
+		}
+
+		self.cree_elements_connections()
+		return self.ix
+
+#	======================================================
+
+class RESEAU_DO1D(Module_Mdl):
+	nom = "RESEAU DO1D"
+	X, Y = [0], [0]
+	X_noms, Y_noms = ["X"], ["Y"] # LSTM [X], [H]
+	params = {
+		'[META] Neurones par couche' : 1,
+		'[META] Couches' : 1,
+		'[META] Y du dot1d partout' : 1,
+		'[Neurone] entree : Grille XY' : 1,
+		'[Neurone] entree : Grille-N-connecte' : 1,
+		'[Neurone] sortie : N-connect'         : 1,
+	}
+
 modules = [
+	#KCONVL_RELU,
+	#
 	CHAINE_N_DOT1D,
 	CHAINE_N_DOT1D_RECURENTE,
+	CHAINE_N_DOT1D_RECURENTE_N_PROFONDE,
+	DOT1D_3,
 	#
 	#GRILLE_XY_DOT1D,
 	#GRILLE_XY_N_DOT1D,
+	GRU1D,
+	CHAINE_GRU1D,
+	#
 	LSTM1D,
+	CHAINE_N_LSTM,
 	LSTM1D_PLUS_PROFOND,
 	#
 	LSTM1D_CONVOLUTION,
 	Chaine_Residuelle_LSTM,
 	#
-	LSTM1D_PARRALLELE
+	LSTM1D_PARRALLELE,
+	#
+	#RESEAU_DO1D
+
+
+	SORTIE_SIMPLE
 ]

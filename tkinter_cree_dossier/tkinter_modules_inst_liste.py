@@ -5,14 +5,15 @@ from tkinter_cree_dossier.tkinter_insts import liste_insts
 #
 from tkinter_cree_dossier.tkinter_insts import i__Entree
 from tkinter_cree_dossier.tkinter_insts import i_Activation
-from tkinter_cree_dossier.tkinter_insts import i_Biais
+from tkinter_cree_dossier.tkinter_insts import i_Biais, i_Const
 from tkinter_cree_dossier.tkinter_insts import i_Dot1d_X, i_Dot1d_XY
-from tkinter_cree_dossier.tkinter_insts import i_Kconvl1d_stricte, i_Kconvl2d_stricte
+from tkinter_cree_dossier.tkinter_insts import i_Kconvl1d, i_Kconvl1d_stricte, i_Kconvl2d_stricte
 from tkinter_cree_dossier.tkinter_insts import i_MatMul, i_MatMul_Canal
 from tkinter_cree_dossier.tkinter_insts import i_Mul2, i_Mul3
 from tkinter_cree_dossier.tkinter_insts import i_Pool2_1d, i_Pool2x2_2d
 from tkinter_cree_dossier.tkinter_insts import i_Softmax
 from tkinter_cree_dossier.tkinter_insts import i_Somme2, i_Somme3, i_Somme4
+from tkinter_cree_dossier.tkinter_insts import i_Sub2
 from tkinter_cree_dossier.tkinter_insts import i_Y, i_Y_canalisation, i_Y_union_2
 
 conn = lambda sortie,inst,entree: (sortie, (inst,entree))

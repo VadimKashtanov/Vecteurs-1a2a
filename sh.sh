@@ -28,6 +28,10 @@ nvcc -c impl/insts/activation/activation_df.cu ${A} &
 nvcc -c impl/insts/biais/biais.cu ${A} &
 nvcc -c impl/insts/biais/biais_f.cu ${A} &
 nvcc -c impl/insts/biais/biais_df.cu ${A} &
+#	/insts/const
+nvcc -c impl/insts/const/const.cu ${A} &
+nvcc -c impl/insts/const/const_f.cu ${A} &
+nvcc -c impl/insts/const/const_df.cu ${A} &
 #	/insts/dot1d_X
 nvcc -c impl/insts/dot1d_X/dot1d_X.cu ${A} &
 nvcc -c impl/insts/dot1d_X/dot1d_X_f.cu ${A} &
@@ -36,6 +40,10 @@ nvcc -c impl/insts/dot1d_X/dot1d_X_df.cu ${A} &
 nvcc -c impl/insts/dot1d_XY/dot1d_XY.cu ${A} &
 nvcc -c impl/insts/dot1d_XY/dot1d_XY_f.cu ${A} &
 nvcc -c impl/insts/dot1d_XY/dot1d_XY_df.cu ${A} &
+#	/insts/kconvl1d
+nvcc -c impl/insts/kconvl1d/kconvl1d.cu ${A} &
+nvcc -c impl/insts/kconvl1d/kconvl1d_f.cu ${A} &
+nvcc -c impl/insts/kconvl1d/kconvl1d_df.cu ${A} &
 #	/insts/kconvl1d_stricte
 nvcc -c impl/insts/kconvl1d_stricte/kconvl1d_stricte.cu ${A} &
 nvcc -c impl/insts/kconvl1d_stricte/kconvl1d_stricte_f.cu ${A} &
@@ -44,6 +52,8 @@ nvcc -c impl/insts/kconvl1d_stricte/kconvl1d_stricte_df.cu ${A} &
 nvcc -c impl/insts/kconvl2d_stricte/kconvl2d_stricte.cu ${A} &
 nvcc -c impl/insts/kconvl2d_stricte/kconvl2d_stricte_f.cu ${A} &
 nvcc -c impl/insts/kconvl2d_stricte/kconvl2d_stricte_df.cu ${A} &
+###
+wait
 #	/insts/matmul1d
 nvcc -c impl/insts/matmul1d/matmul1d.cu ${A} &
 nvcc -c impl/insts/matmul1d/matmul1d_f.cu ${A} &
@@ -68,12 +78,12 @@ nvcc -c impl/insts/pool2_1d/pool2_1d_df.cu ${A} &
 nvcc -c impl/insts/pool2x2_2d/pool2x2_2d.cu ${A} &
 nvcc -c impl/insts/pool2x2_2d/pool2x2_2d_f.cu ${A} &
 nvcc -c impl/insts/pool2x2_2d/pool2x2_2d_df.cu ${A} &
-###
-wait
 #	/insts/softmax
 nvcc -c impl/insts/softmax/softmax.cu ${A} &
 nvcc -c impl/insts/softmax/softmax_f.cu ${A} &
 nvcc -c impl/insts/softmax/softmax_df.cu ${A} &
+###
+wait
 #	/insts/somme2
 nvcc -c impl/insts/somme2/somme2.cu ${A} &
 nvcc -c impl/insts/somme2/somme2_f.cu ${A} &
@@ -86,6 +96,10 @@ nvcc -c impl/insts/somme3/somme3_df.cu ${A} &
 nvcc -c impl/insts/somme4/somme4.cu ${A} &
 nvcc -c impl/insts/somme4/somme4_f.cu ${A} &
 nvcc -c impl/insts/somme4/somme4_df.cu ${A} &
+#	/insts/sub2
+nvcc -c impl/insts/sub2/sub2.cu ${A} &
+nvcc -c impl/insts/sub2/sub2_f.cu ${A} &
+nvcc -c impl/insts/sub2/sub2_df.cu ${A} &
 #	/insts/Y
 nvcc -c impl/insts/Y/Y.cu ${A} &
 nvcc -c impl/insts/Y/Y_f.cu ${A} &

@@ -58,6 +58,20 @@ class i_Biais(Inst):
 		#	Params
 		assert len(self.params) == 0
 
+class i_Const(Inst):
+	nom = "cst"
+	params = ['const']
+	params_str = [1]
+	X = []
+	Y =  0
+
+	def assert_coherance(self):
+		assert len(self.X) == 0
+		assert self.Y > 0
+
+		#	Params
+		assert len(self.params) == 1
+
 ############################################
 
 class i_Dot1d_X(Inst):
@@ -102,6 +116,34 @@ class i_Dot1d_XY(Inst):
 		assert self.params[1] in activs
 
 ############################################
+
+class i_Kconvl1d(Inst):
+	nom = "Kconvl1d"
+	params = [0,0,0,0,0]
+	params_str = ['K', 'C0', 'C1', 'im_X', 'im_Y']
+	X = [0]
+	Y =  0
+
+	def assert_coherance(self):
+		assert len(self.X) == 1
+		assert self.Y > 0
+
+		#	Params
+		assert len(self.params) == 5
+		K, C0, C1, im_X, im_Y = self.params
+
+		N = (K-1)/2
+
+		assert N > 0
+		assert C0 > 0
+		assert C1 > 0
+		assert im_X > 0
+		assert im_Y > 0
+
+		assert im_Y == im_X-N-N
+
+		assert self.X[0] == C0*im_X
+		assert self.Y    == C1*im_Y #(im_X-2*N)*(im_Y-2*N)
 
 class i_Kconvl1d_stricte(Inst):
 	nom = "Kconvl1d_stricte"
@@ -330,6 +372,22 @@ class i_Somme4(Inst):
 
 ##########################################
 
+class i_Sub2(Inst):
+	nom = "A-B"
+	params = []
+	params_str = []
+	X = [0,0]
+	Y =  0
+
+	def assert_coherance(self):
+		assert len(self.X) == 2
+		assert self.Y == self.X[0] == self.X[1]
+
+		#	Params
+		assert len(self.params) == 0
+
+##########################################
+
 class i_Y(Inst):
 	nom = "Y"
 	params = []
@@ -380,10 +438,12 @@ liste_insts = [
 	#
 	i_Activation,
 	i_Biais,
+	i_Const,
 	#
 	i_Dot1d_X,
 	i_Dot1d_XY,
 	#
+	i_Kconvl1d,
 	i_Kconvl1d_stricte,
 	i_Kconvl2d_stricte,
 	#
@@ -401,6 +461,8 @@ liste_insts = [
 	i_Somme2,
 	i_Somme3,
 	i_Somme4,
+	#
+	i_Sub2,
 	#
 	i_Y,
 	i_Y_canalisation,

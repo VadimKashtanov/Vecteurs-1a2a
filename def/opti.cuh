@@ -2,8 +2,7 @@
 
 #include "mdl.cuh"
 
-#define L2_regularisation 0.0
-
+#define L2_regularisation 0.01
 #define ADAM 0
 #define ADAM_HISTOIRE 2
 
