@@ -27,7 +27,6 @@ def norme_relative(l):
 
 #python3 prixs/dar.py PRIXS={HEURES} prixs/tester_model_donnee.bin BTC, ETH, ...
 
-LIGNES = 256 #une ligne = une analyse du marché
 N      = 8
 P      = 1#3 #1#3
 
@@ -73,7 +72,7 @@ DIRECT = [
 	for m in MARCHEES
 		for ex in ('prixs', 'low', 'high', 'volumes', 'volumes_A', 'volumes_U',)
 			for i in heures
-				for j in (1/2, 1, 2)
+				for j in (1,)#(1/2, 1, 2)
 					if 1 <= (i*j) < INTERVALLE_MAX
 ]
 OK("DIRECTE")
@@ -87,8 +86,8 @@ MACD = [
 	for m in MARCHEES
 		for ex in ('prixs',)
 			for i in heures
-				for j in (1/2, 1, 2)
-					for k in (1/8, 1/4, 1/2)
+				for j in (1,)#(1/2, 1, 2)
+					for k in (1/8, 1/2)#(1/8, 1/4, 1/2)
 						if 1 <= (i*j) < INTERVALLE_MAX
 ]
 OK("MACD")
@@ -102,7 +101,7 @@ CHIFFRE = [
 	for m in MARCHEES
 		for ex in ('prixs',)
 			for i in heures
-				for j in (1/2, 1, 2)
+				for j in (1,)#:(1/2, 1, 2)
 					for k in (1000, 10000)
 						if 1 <= (i*j) < INTERVALLE_MAX
 ]
