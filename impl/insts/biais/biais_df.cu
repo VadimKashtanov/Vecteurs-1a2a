@@ -18,6 +18,7 @@ static void d_kerd__biais(
 	if (_y < Y && _t < GRAND_T) {
 		uint ty  = t_MODE(_t, mega_t);
 		
+		//y[ty*Y + _y] = p[_y];
 		atomicAdd(&dp[_y], dy[ty*Y + _y]);
 	};
 };

@@ -22,6 +22,7 @@ __global__ static void kerd_adam(
 		float ch  = alpha * _grad;//*/alpha * _grad * corr_v / (sqrtf(corr_s) + 1e-8);
 		float reg = alpha * L2_regularisation * p[thx];
 		//
+		//printf("=====%f\n", ch+reg);
 		p[thx] -= (ch + reg);
 		v[thx] = _v;
 		s[thx] = _s;

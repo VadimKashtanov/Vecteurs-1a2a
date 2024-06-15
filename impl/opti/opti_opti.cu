@@ -26,13 +26,19 @@ void opti(
 	}
 	//	--- Plume ---
 	mdl_plume_grad(mdl, btcusdt, ts__d);
+	//
+	float _max_abs_grad = 1;//mdl_max_abs_grad(mdl);
+	if (_max_abs_grad == 0) ERR("Le grad max est = 0");
+	//
+	printf("alpha=%f, max_abs_grad=%f => nouveau alpha=%f\n", alpha, _max_abs_grad, alpha / _max_abs_grad);
+	//
 	//	--- Opti  ---
 	FOR(0, i, I) {
 		if (i != 0) {
 			//	dF(x)
 			mdl_allez_retour(mdl, btcusdt, ts__d);
 			//	x = x - dx
-			if (methode == ADAM) adam(mdl, hist, i, alpha);
+			if (methode == ADAM) adam(mdl, hist, i, alpha / _max_abs_grad);
 		}
 		//
 		if (i % tous_les == 0) {

@@ -15,7 +15,7 @@ static __global__ void k__df_btcusdt(
 		uint t_btcusdt = ts__d[t] + mega_t;
 		//
 		float A = y[ty*Y + 0];
-		assert(A >= -1 && A <= +1);
+		assert(A >= 0 && A <= +1);
 		float _da = 0;
 		//
 		FOR(0, p, P) {

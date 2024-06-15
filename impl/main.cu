@@ -140,7 +140,7 @@ int main() {
 	//	=========================================================
 	//	=========================================================
 	//	=========================================================
-	verif_mdl_1e5();
+	//verif_mdl_1e5();
 
 	//exit(0);
 
@@ -185,8 +185,8 @@ int main() {
 		printf(" === Echope %i ===\n", e);
 		
 		//
-		uint I        = 100;
-		uint tous_les =  20;
+		uint I        = 50;
+		uint tous_les = 10;
 		
 		//
 		srand(time(NULL));
@@ -196,7 +196,7 @@ int main() {
 		uint * ts__d = cpu_vers_gpu<uint>(ts, GRAND_T);
 
 		//
-		opti(mdl, btcusdt, ts__d, I, tous_les, ADAM, 5e-3);
+		opti(mdl, btcusdt, ts__d, I, tous_les, ADAM, 1e-3);
 		ecrire_mdl("mdl.bin", mdl);
 
 		if (e % 10 == 0) {

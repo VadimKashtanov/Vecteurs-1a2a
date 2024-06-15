@@ -18,7 +18,7 @@ static __global__ void k__f_btcusdt(
 		assert(t_btcusdt < T);
 		//
 		float A = y[ty*Y + 0];
-		assert(A >= -1 && A <= +1);
+		assert(A >= 0 && A <= +1);
 		//
 		FOR(0, p, P) {
 			float _y = y[ty*Y + 1+p];
@@ -27,7 +27,11 @@ static __global__ void k__f_btcusdt(
 			float _p1p0 = p1p0[t_btcusdt*P + p];
 			//
 			float _S = S(A, _y, _p1p0);
+			
+
 			assert(_S >= 0);
+
+
 			//printf(">> %f %f\n", _y, p1p0[t_btcusdt*P + p]);
 			//if (t==0 && mega_t==0 && p==0) printf("%f %f\n", _y, _p1p0);
 			//

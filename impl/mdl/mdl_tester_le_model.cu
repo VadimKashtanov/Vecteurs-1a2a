@@ -74,7 +74,7 @@ void tester_le_model(Mdl_t * mdl, BTCUSDT_t * btcusdt) {
 			PLUME_CMP(a, b);
 			if (b != 0) printf(" (x%+f) ", a/b);
 			printf(" (%+fs)", (float)testés / VALEUR_CHRONO(s));
-			printf(" |%i|\n", lp++);
+			printf(" |%i  inst=%i|\n", lp++, i);
 			testés++;
 		};
 	};

@@ -17,7 +17,7 @@ float rnd()
 }
 
 float poid_1_1() {
-	float amplitude = 1;//tanh(5*rnd());//powf(2.0, rnd())-1.0;
+	float amplitude = 1;//tanh(8*rnd());//powf(2.0, rnd())-1.0;
 	float vecteur   = 2*rnd()-1;
 	//
 	return amplitude * vecteur;
