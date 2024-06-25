@@ -20,11 +20,7 @@ static void kerd__activation(
 		//
 		float s = x0[tx0*X0 + _y];
 		//
-		float a;
-		if      (activ == 0) a = tanh(s);
-		else if (activ == 1) a = 1 / (1 + expf(-s));
-		else if (activ == 2) a = expf(-s*s);
-		else if (activ == 3) a = (s > 0 ? s : 0.0);
+		float a = ACTIVATION(activ, s);
 		//
 		y[ty*Y + _y] = a;
 		l[ty*L + _y] = s;

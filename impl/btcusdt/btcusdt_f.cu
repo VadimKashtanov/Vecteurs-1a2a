@@ -18,7 +18,7 @@ static __global__ void k__f_btcusdt(
 		assert(t_btcusdt < T);
 		//
 		float A = y[ty*Y + 0];
-		assert(A >= 0 && A <= +1);
+		assert(A >= -1 && A <= +1);
 		//
 		FOR(0, p, P) {
 			float _y = y[ty*Y + 1+p];

@@ -22,11 +22,7 @@ static void d_kerd__activation(
 		float a = y[ty*Y + _y];
 		float s = l[ty*L + _y];
 
-		float da;
-		if      (activ == 0) da = 1 - a*a;
-		else if (activ == 1) da = a * (1 - a);
-		else if (activ == 2) da = -2*s * a;
-		else if (activ == 4) da = (s>0);
+		float da = d_ACTIVATION(activ, s, a);
 
 		atomicAdd(&dx0[tx0*X0 + _y], dy[ty*Y + _y] * da);
 	};

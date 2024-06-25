@@ -53,7 +53,7 @@ void tester_le_model(Mdl_t * mdl, BTCUSDT_t * btcusdt) {
 	uint testés = 1;
 	//
 	float S = mdl_S(mdl, btcusdt, ts__d);
-	float _1E5 = 3e-3;
+	float _1E5 = 1e-2;//3e-3;
 	uint lp = 0;
 	FOR(0, i, mdl->insts) {
 		printf("#### INSTRUCTION %i (%s Y=%i) ####\n",

@@ -34,11 +34,15 @@ void opti(
 	//
 	//	--- Opti  ---
 	FOR(0, i, I) {
+		/*uint alea_ts[GRAND_T];
+		FOR(0, j, GRAND_T) alea_ts[j] = rand() % (btcusdt->T - MEGA_T - 1);
+		CONTROLE_CUDA(cudaMemcpy(ts__d, alea_ts, sizeof(uint)*GRAND_T, cudaMemcpyHostToDevice));*/
+
 		if (i != 0) {
 			//	dF(x)
 			mdl_allez_retour(mdl, btcusdt, ts__d);
 			//	x = x - dx
-			if (methode == ADAM) adam(mdl, hist, i, alpha / _max_abs_grad);
+			if (methode == ADAM) adam(mdl, hist, i, alpha / _max_abs_grad, i);
 		}
 		//
 		if (i % tous_les == 0) {

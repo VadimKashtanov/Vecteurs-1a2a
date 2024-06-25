@@ -7,6 +7,7 @@
 //
 #include "insts/activation.cuh"
 #include "insts/biais.cuh"
+#include "insts/cadrans_pondérés.cuh"
 #include "insts/const.cuh"
 //
 #include "insts/dot1d_X.cuh"
@@ -18,6 +19,7 @@
 //
 #include "insts/matmul1d.cuh"
 #include "insts/matmul1d_canal.cuh"
+#include "insts/matmul2d_sans_poids.cuh"
 //
 #include "insts/mul2.cuh"
 #include "insts/mul3.cuh"
@@ -25,13 +27,15 @@
 #include "insts/pool2_1d.cuh"
 #include "insts/pool2x2_2d.cuh"
 //
-#include "insts/softmax.cuh"
+#include "insts/somme.cuh"
 //
 #include "insts/somme2.cuh"
 #include "insts/somme3.cuh"
 #include "insts/somme4.cuh"
 //
 #include "insts/sub2.cuh"
+//
+#include "insts/vect_div_unitair.cuh"
 //
 #include "insts/Y.cuh"
 #include "insts/Y_canalisation.cuh"
@@ -41,6 +45,7 @@ uint inst_Xs[INSTS] = {
 	_entree__Xs,
 	activation__Xs,
 	biais__Xs,
+	cadrans_pondérés__Xs,
 	const__Xs,
 	dot1d_X__Xs,
 	dot1d_XY__Xs,
@@ -49,15 +54,17 @@ uint inst_Xs[INSTS] = {
 	kconvl2d_stricte__Xs,
 	matmul1d__Xs,
 	matmul1d_canal__Xs,
+	matmul2d_sans_poids__Xs,
 	mul2__Xs,
 	mul3__Xs,
 	pool2_1d__Xs,
 	pool2x2_2d__Xs,
-	softmax__Xs,
+	somme__Xs,
 	somme2__Xs,
 	somme3__Xs,
 	somme4__Xs,
 	sub2__Xs,
+	vect_div_unitair__Xs,
 	Y__Xs,
 	Y_canalisation__Xs,
 	Y_union_2__Xs
@@ -67,6 +74,7 @@ uint inst_PARAMS[INSTS] = {
 	_entree__PARAMS,
 	activation__PARAMS,
 	biais__PARAMS,
+	cadrans_pondérés__PARAMS,
 	const__PARAMS,
 	dot1d_X__PARAMS,
 	dot1d_XY__PARAMS,
@@ -75,15 +83,17 @@ uint inst_PARAMS[INSTS] = {
 	kconvl2d_stricte__PARAMS,
 	matmul1d__PARAMS,
 	matmul1d_canal__PARAMS,
+	matmul2d_sans_poids__PARAMS,
 	mul2__PARAMS,
 	mul3__PARAMS,
 	pool2_1d__PARAMS,
 	pool2x2_2d__PARAMS,
-	softmax__PARAMS,
+	somme__PARAMS,
 	somme2__PARAMS,
 	somme3__PARAMS,
 	somme4__PARAMS,
 	sub2__PARAMS,
+	vect_div_unitair__PARAMS,
 	Y__PARAMS,
 	Y_canalisation__PARAMS,
 	Y_union_2__PARAMS
@@ -93,6 +103,7 @@ dimention_f calculer_P[INSTS] = {
 	_entree__calculer_P,
 	activation__calculer_P,
 	biais__calculer_P,
+	cadrans_pondérés__calculer_P,
 	const__calculer_P,
 	dot1d_X__calculer_P,
 	dot1d_XY__calculer_P,
@@ -101,15 +112,17 @@ dimention_f calculer_P[INSTS] = {
 	kconvl2d_stricte__calculer_P,
 	matmul1d__calculer_P,
 	matmul1d_canal__calculer_P,
+	matmul2d_sans_poids__calculer_P,
 	mul2__calculer_P,
 	mul3__calculer_P,
 	pool2_1d__calculer_P,
 	pool2x2_2d__calculer_P,
-	softmax__calculer_P,
+	somme__calculer_P,
 	somme2__calculer_P,
 	somme3__calculer_P,
 	somme4__calculer_P,
 	sub2__calculer_P,
+	vect_div_unitair__calculer_P,
 	Y__calculer_P,
 	Y_canalisation__calculer_P,
 	Y_union_2__calculer_P
@@ -119,6 +132,7 @@ dimention_f calculer_L[INSTS] = {
 	_entree__calculer_L,
 	activation__calculer_L,
 	biais__calculer_L,
+	cadrans_pondérés__calculer_L,
 	const__calculer_L,
 	dot1d_X__calculer_L,
 	dot1d_XY__calculer_L,
@@ -127,15 +141,17 @@ dimention_f calculer_L[INSTS] = {
 	kconvl2d_stricte__calculer_L,
 	matmul1d__calculer_L,
 	matmul1d_canal__calculer_L,
+	matmul2d_sans_poids__calculer_L,
 	mul2__calculer_L,
 	mul3__calculer_L,
 	pool2_1d__calculer_L,
 	pool2x2_2d__calculer_L,
-	softmax__calculer_L,
+	somme__calculer_L,
 	somme2__calculer_L,
 	somme3__calculer_L,
 	somme4__calculer_L,
 	sub2__calculer_L,
+	vect_div_unitair__calculer_L,
 	Y__calculer_L,
 	Y_canalisation__calculer_L,
 	Y_union_2__calculer_L
@@ -145,6 +161,7 @@ inst__f_f __f_inst[INSTS] = {
 	_entree__f,
 	activation__f,
 	biais__f,
+	cadrans_pondérés__f,
 	const__f,
 	dot1d_X__f,
 	dot1d_XY__f,
@@ -153,15 +170,17 @@ inst__f_f __f_inst[INSTS] = {
 	kconvl2d_stricte__f,
 	matmul1d__f,
 	matmul1d_canal__f,
+	matmul2d_sans_poids__f,
 	mul2__f,
 	mul3__f,
 	pool2_1d__f,
 	pool2x2_2d__f,
-	softmax__f,
+	somme__f,
 	somme2__f,
 	somme3__f,
 	somme4__f,
 	sub2__f,
+	vect_div_unitair__f,
 	Y__f,
 	Y_canalisation__f,
 	Y_union_2__f
@@ -171,6 +190,7 @@ inst_df_f _df_inst[INSTS] = {
 	_entree__df,
 	activation__df,
 	biais__df,
+	cadrans_pondérés__df,
 	const__df,
 	dot1d_X__df,
 	dot1d_XY__df,
@@ -179,15 +199,17 @@ inst_df_f _df_inst[INSTS] = {
 	kconvl2d_stricte__df,
 	matmul1d__df,
 	matmul1d_canal__df,
+	matmul2d_sans_poids__df,
 	mul2__df,
 	mul3__df,
 	pool2_1d__df,
 	pool2x2_2d__df,
-	softmax__df,
+	somme__df,
 	somme2__df,
 	somme3__df,
 	somme4__df,
 	sub2__df,
+	vect_div_unitair__df,
 	Y__df,
 	Y_canalisation__df,
 	Y_union_2__df
@@ -197,6 +219,7 @@ inst_f init_poids[INSTS] = {
 	_entree__init_poids,
 	activation__init_poids,
 	biais__init_poids,
+	cadrans_pondérés__init_poids,
 	const__init_poids,
 	dot1d_X__init_poids,
 	dot1d_XY__init_poids,
@@ -205,15 +228,17 @@ inst_f init_poids[INSTS] = {
 	kconvl2d_stricte__init_poids,
 	matmul1d__init_poids,
 	matmul1d_canal__init_poids,
+	matmul2d_sans_poids__init_poids,
 	mul2__init_poids,
 	mul3__init_poids,
 	pool2_1d__init_poids,
 	pool2x2_2d__init_poids,
-	softmax__init_poids,
+	somme__init_poids,
 	somme2__init_poids,
 	somme3__init_poids,
 	somme4__init_poids,
 	sub2__init_poids,
+	vect_div_unitair__init_poids,
 	Y__init_poids,
 	Y_canalisation__init_poids,
 	Y_union_2__init_poids
@@ -223,6 +248,7 @@ const char * inst_Nom[INSTS] = {
 	_entree_nom,
 	activation_nom,
 	biais_nom,
+	cadrans_pondérés_nom,
 	const_nom,
 	dot1d_X_nom,
 	dot1d_XY_nom,
@@ -231,15 +257,17 @@ const char * inst_Nom[INSTS] = {
 	kconvl2d_stricte_nom,
 	matmul1d_nom,
 	matmul1d_canal_nom,
+	matmul2d_sans_poids_nom,
 	mul2_nom,
 	mul3_nom,
 	pool2_1d_nom,
 	pool2x2_2d_nom,
-	softmax_nom,
+	somme_nom,
 	somme2_nom,
 	somme3_nom,
 	somme4_nom,
 	sub2_nom,
+	vect_div_unitair_nom,
 	Y_nom,
 	Y_canalisation_nom,
 	Y_union_2_nom
