@@ -41,8 +41,8 @@ class i_Activation(Inst):
 		#	Params
 		assert len(self.params) == 1
 		#       tanh, logistic, gauss, relu
-		activs = (0,     1,       2,     3)
-		assert self.params[0] in activs
+		#activs = (0,     1,       2,     3)
+		#assert self.params[0] in activs
 
 class i_Biais(Inst):
 	nom = "+b"
@@ -57,6 +57,28 @@ class i_Biais(Inst):
 
 		#	Params
 		assert len(self.params) == 0
+
+class i_Cadrans_Pondérés(Inst):
+	nom = "Cadrans Pondérés"
+	params = [0,1,1]
+	params_str = ['Cx', 'C0', 'C1']
+	X = [0]
+	Y =  0
+
+	def assert_coherance(self):
+		assert len(self.X) == 1
+		assert self.Y > 0
+		assert self.X[0] > 0
+
+		#	Params
+		assert len(self.params) == 3
+
+		Cx = self.params[0]
+		C0 = self.params[1]
+		C1 = self.params[2]
+
+		assert self.Y == Cx*C1
+		assert self.X[0] == Cx*C0
 
 class i_Const(Inst):
 	nom = "cst"
@@ -91,8 +113,8 @@ class i_Dot1d_X(Inst):
 		assert self.X[0] % C0 == 0
 		assert self.Y    % C0 == 0
 		#       tanh, logistic, gauss, relu
-		activs = (0,     1,       2,     3)
-		assert self.params[1] in activs
+		#activs = (0,     1,       2,     3)
+		#assert self.params[1] in activs
 
 class i_Dot1d_XY(Inst):
 	nom = "Dot1d XY"
@@ -112,8 +134,8 @@ class i_Dot1d_XY(Inst):
 		assert self.X[1] % C0 == 0
 		assert self.Y    % C0 == 0
 		#       tanh, logistic, gauss, relu
-		activs = (0,     1,       2,     3)
-		assert self.params[1] in activs
+		#activs = (0,     1,       2,     3)
+		#assert self.params[1] in activs
 
 ############################################
 
@@ -146,7 +168,7 @@ class i_Kconvl1d(Inst):
 		assert self.Y    == C1*im_Y #(im_X-2*N)*(im_Y-2*N)
 
 class i_Kconvl1d_stricte(Inst):
-	nom = "Kconvl1d_stricte"
+	nom = "Kconvl1d stricte"
 	params = [0,0,0,0]
 	params_str = ['K', 'C0', 'C1', 'im_X']
 	X = [0]
@@ -171,7 +193,7 @@ class i_Kconvl1d_stricte(Inst):
 		assert self.Y    == C1*im_X #(im_X-2*N)*(im_Y-2*N)
 
 class i_Kconvl2d_stricte(Inst):
-	nom = "Kconvl2d_stricte"
+	nom = "Kconvl2d stricte"
 	params = [0,0,0,0,0]
 	params_str = ['K', 'C0', 'C1', 'im_X', 'im_Y']
 	X = [0]
@@ -235,6 +257,31 @@ class i_MatMul_Canal(Inst):
 
 		assert C0 % M == 0
 		assert C1 % M == 0
+
+class i_Matmul2d_Sans_Poids(Inst):
+	nom = "A@B sans poids"
+	params = [1,1,1,1]
+	params_str = ['Ax', 'Ay', 'Bx', 'C0']
+	X = [0,0]
+	Y =  0
+
+	def assert_coherance(self):
+		assert len(self.X) == 2
+		assert self.Y > 0
+		assert self.X[0] > 0
+		assert self.X[1] > 0
+
+		#	Params
+		assert len(self.params) == 4
+
+		Ax, Ay, Bx, C0 = self.params
+
+		assert all(i>0 for i in self.params)
+
+		assert self.X[0] == C0*Ax*Ay
+		assert self.X[1] == C0*Ax*Bx
+
+		assert self.Y == C0*Ay*Bx
 
 ############################################
 
@@ -312,19 +359,21 @@ class i_Pool2x2_2d(Inst):
 
 ############################################
 
-class i_Softmax(Inst):
-	nom = "Softmax"
-	params = []
-	params_str = []
+class i_Somme(Inst):
+	nom = "Somme"
+	params = [1]
+	params_str = ['C0']
 	X = [0]
 	Y =  0
 
 	def assert_coherance(self):
 		assert len(self.X) == 1
-		assert self.Y == self.X[0]
+		assert self.Y == self.params[0]
 
 		#	Params
-		assert len(self.params) == 0
+		assert len(self.params) == 1
+
+		assert self.params[0] > 0 #i_Somme C0>0
 
 ############################################
 
@@ -388,6 +437,24 @@ class i_Sub2(Inst):
 
 ##########################################
 
+class i_Vect_Div_Unitair(Inst):
+	nom = "x0/x1[0]"
+	params = [1]
+	params_str = ['C0']
+	X = [0,0]
+	Y =  0
+
+	def assert_coherance(self):
+		assert len(self.X) == 2
+		assert self.Y == self.X[0]
+		assert self.X[1] == self.params[0]
+
+		#	Params
+		assert len(self.params) == 1
+		assert self.params[0] > 0 #C0 de Vect_Div_Unitair
+
+##########################################
+
 class i_Y(Inst):
 	nom = "Y"
 	params = []
@@ -438,6 +505,7 @@ liste_insts = [
 	#
 	i_Activation,
 	i_Biais,
+	i_Cadrans_Pondérés,
 	i_Const,
 	#
 	i_Dot1d_X,
@@ -450,19 +518,23 @@ liste_insts = [
 	i_MatMul,
 	i_MatMul_Canal,
 	#
+	i_Matmul2d_Sans_Poids,
+	#
 	i_Mul2,
 	i_Mul3,
 	#
 	i_Pool2_1d,
 	i_Pool2x2_2d,
 	#
-	i_Softmax,
+	i_Somme,
 	#
 	i_Somme2,
 	i_Somme3,
 	i_Somme4,
 	#
 	i_Sub2,
+	#
+	i_Vect_Div_Unitair,
 	#
 	i_Y,
 	i_Y_canalisation,

@@ -1,4 +1,7 @@
 class Module_Mdl:
+	bg  = None
+	fg  = None
+	img = None
 	def __init__(self, X=None, Y=None, params=None):
 		if X != None:
 			assert len(X) == len(self.X)
