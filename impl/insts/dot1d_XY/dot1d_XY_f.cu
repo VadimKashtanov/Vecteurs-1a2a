@@ -46,22 +46,9 @@ static __global__ void kerd_f_ax_b__t(
 			s += x0[tx0*X0_vars + depart_x0 + i] * p[depart_a0 + _y*X0 + i];
 		}
 		//
-		float  a;
-		float da;
-		//
-		if        (activ == 0) {
-			a  = tanh(s);
-			da = 1 - a*a;
-		} else if (activ == 1) {
-			a  = 1 / (1 + expf(-s));
-			da = a * (1 - a);
-		} else if (activ == 2) {
-			a  = expf(-s*s);
-			da = -2*s*a;
-		} else if (activ == 3) {
-			a  = s * (s > 0);
-			da = (s > 0);
-		}
+		f2 a_da = ACTIVATION_f_df(activ, s);
+		float a  = a_da.f0;
+		float da = a_da.f1;
 		//
 		y[ty*Y__vars + depart__y + _y] =  a;
 		l[ty*L__vars + depart__l + _y] = da;
