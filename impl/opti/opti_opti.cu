@@ -3,7 +3,10 @@
 #include "../impl_template/tmpl_etc.cu"
 
 uint hists[] = {
-	ADAM_HISTOIRE
+	SGD_____HISTOIRE,
+	MOMENT__HISTOIRE,
+	RMSPROP_HISTOIRE,
+	ADAM____HISTOIRE
 };
 
 void opti(
@@ -30,19 +33,21 @@ void opti(
 	float _max_abs_grad = 1;//mdl_max_abs_grad(mdl);
 	if (_max_abs_grad == 0) ERR("Le grad max est = 0");
 	//
+	alpha /= _max_abs_grad;
+	//
 	printf("alpha=%f, max_abs_grad=%f => nouveau alpha=%f\n", alpha, _max_abs_grad, alpha / _max_abs_grad);
 	//
 	//	--- Opti  ---
 	FOR(0, i, I) {
-		/*uint alea_ts[GRAND_T];
-		FOR(0, j, GRAND_T) alea_ts[j] = rand() % (btcusdt->T - MEGA_T - 1);
-		CONTROLE_CUDA(cudaMemcpy(ts__d, alea_ts, sizeof(uint)*GRAND_T, cudaMemcpyHostToDevice));*/
-
 		if (i != 0) {
 			//	dF(x)
 			mdl_allez_retour(mdl, btcusdt, ts__d);
+
 			//	x = x - dx
-			if (methode == ADAM) adam(mdl, hist, i, alpha / _max_abs_grad, i);
+			if (methode == SGD    ) sgd    (mdl, hist, i, alpha, i);
+			if (methode == MOMENT ) moment (mdl, hist, i, alpha, i);
+			if (methode == RMSPROP) rmsprop(mdl, hist, i, alpha, i);
+			if (methode == ADAM   ) adam   (mdl, hist, i, alpha, i);
 		}
 		//
 		if (i % tous_les == 0) {
@@ -73,6 +78,7 @@ void opti(
 			free(p8);
 		};
 	};
+	//
 	//
 	FOR(0, h, hists[methode]) {
 		FOR(0, i, mdl->insts) {
