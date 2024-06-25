@@ -197,7 +197,7 @@ int main() {
 		uint * ts__d = cpu_vers_gpu<uint>(ts, GRAND_T);
 
 		//
-		opti(mdl, btcusdt, ts__d, I, tous_les, ADAM, 1e-4);
+		opti(mdl, btcusdt, ts__d, I, tous_les, SGD, 1e-4);
 		ecrire_mdl("mdl.bin", mdl);
 
 		if (e % 10 == 0) {
