@@ -1,77 +1,43 @@
-import time
-import datetime
+import struct as st
+import matplotlib.pyplot as plt
 
-import requests
+ETAPE = lambda I, intitulé: print(f"\033[92m[OK]\033[0m Etape {I}: {intitulé}")
 
-from os import system
+def normer(l):
+	_min, _max = min(l), max(l)
+	return [(e-_min)/(_max-_min) for e in l]
 
-ARONDIRE_AU_MODULO = lambda x,mod: (x + (mod - (x%mod)) if x%mod!=0 else x)
+def normer_11(l):
+	_min, _max = min(l), max(l)
+	return [2*(e-_min)/(_max-_min)-1 for e in l]
 
-milliseconde = lambda la: int(la * 1000   )*1
-seconde      = lambda la: int(la          )*1000
-heure        = lambda la: int(la / (60*60))*1000*60*60
+####################################################################################
 
-requette_bitget = lambda de, a, SYMBOLE: eval(
-	requests.get(
-		f"https://api.bitget.com/api/mix/v1/market/history-candles?symbol={SYMBOLE}_UMCBL&granularity=1H&startTime={de}&endTime={a}"
-	).text
-)
+d = "1H"# "15m"
 
-HEURES_PAR_REQUETTE = 100
+T = (4)*7*24 # * 4
 
-T = (30)*24
+P = 1
+
 N = 8
 INTERVALLE_MAX = 256
 DEPART = INTERVALLE_MAX * N
 
-HEURES = DEPART + T
-HEURES = ARONDIRE_AU_MODULO(HEURES, HEURES_PAR_REQUETTE)
+HEURES = DEPART + T + P
 
-la = heure(time.time())
-heures_voulues = [
-	la - 60*60*1000*i
-	for i in range(ARONDIRE_AU_MODULO(HEURES, HEURES_PAR_REQUETTE))
-][::-1]
+from bitget_donnee import DONNEES_BITGET, faire_un_csv
 
-donnees_BTCUSDT = []
+donnees = DONNEES_BITGET(HEURES, d)
+csv = faire_un_csv(donnees, NOM="bitgetBTCUSDT")
 
-REQUETTES = int(len(heures_voulues) / HEURES_PAR_REQUETTE)
-print(f"Extraction de {len(heures_voulues)} heures depuis api.bitget.com ...")
-for i in range(REQUETTES):
-	paquet_heures_btc = requette_bitget(heures_voulues[i*HEURES_PAR_REQUETTE], heures_voulues[(i+1)*HEURES_PAR_REQUETTE-1], "BTCUSDT")
-	donnees_BTCUSDT += paquet_heures_btc
-
-	if i % 1 == 0:
-		print(f"[{round(i*HEURES_PAR_REQUETTE/len(heures_voulues)*100)}%],   len(paquet_heures_btc)={len(paquet_heures_btc)}, (btc,)")
-
-print(f"HEURES VOULUES = {len(heures_voulues)}, len(donnees_BTCUSDT)={len(donnees_BTCUSDT)}")
-
-bitgetBTCUSDT = """https://www.CryptoDataDownload.com
-Unix,Date,Symbol,Open,High,Low,Close,Volume,Volume Base Asset,tradecount
-"""
-for _,o,h,l,c,vB,vU in donnees_BTCUSDT[::-1]:
-	bitgetBTCUSDT += f'0,0,bitgetBTCUSDT,{o},{h},{l},{c},{vU},{vB},0\n'
-
-prixs = [float(c) for _,o,h,l,c,vB,vU in donnees_BTCUSDT]
-
-print("- prixs:", prixs[-5:])
+print(f"Len donnees = {len(donnees)}")
 
 with open('prixs/bitgetBTCUSDT.csv', 'w') as co:
-	co.write(bitgetBTCUSDT)
+	co.write(csv)
 
-print("\033[92m[OK]\033[0m Etape 1: Ecriture CSV")
+ETAPE(1, "Ecriture CSV")
 
-system("python3 prixs/ecrire_multi_sources.py prixs/bitgetBTCUSDT.csv")
-print("\033[92m[OK]\033[0m Etape 2: Ecriture Multi Source")
-
-system(f"python3 prixs/dar.py PRIXS={HEURES} prixs/tester_model_donnee.bin bitgetBTC")
-print("\033[92m[OK]\033[0m Etape 3: dar.py")
-
-system("rm les_predictions.bin")
-
-system(f"./prog_tester_le_mdl")
-
-import struct as st
+####################################################################################
 
 with open("structure_generale.bin", 'rb') as co:
 	bins = co.read()
@@ -80,12 +46,17 @@ with open("structure_generale.bin", 'rb') as co:
 	#
 	MEGA_T, = elements
 
-with open("les_predictions.bin", 'rb') as co:
-	bins = co.read()
-	I = int( int(len(bins)/4) / 3)
-	les_Amplitudes  = st.unpack('f'*I, bins[0*4*I:1*4*I])
-	les_predictions = st.unpack('f'*I, bins[1*4*I:2*4*I])
-	les_delats      = st.unpack('f'*I, bins[2*4*I:3*4*I])
+from calcule import calcule
+
+les_Amplitudes, les_predictions, les_delats = calcule(donnees, "bitgetBTC", MEGA_T)
+
+les_Amplitudes  = [(i+1)/2 for i in les_Amplitudes] #[-1;+1] ->  [0;1]
+les_predictions = les_predictions                   #[-1;+1]
+les_delats      = les_delats                        #[-inf;+inf]
+
+####################################################################################
+
+prixs = [float(c) for _,o,h,l,c,vB,vU in donnees]
 
 print("les_Amplitudes ", les_Amplitudes [-7:])
 print("les_predictions", les_predictions[-7:])
@@ -98,20 +69,14 @@ print("deltas    ", deltas    [-5:])
 
 print(f"moyenne des differences des deltas : {sum([abs(a-b) for a,b in zip(deltas, les_delats)])/len(deltas)}")
 
-#breakpoint()
+####################################################################################
 
-def normer(l):
-	_min, _max = min(l), max(l)
-	return [(e-_min)/(_max-_min) for e in l]
-
-import matplotlib.pyplot as plt
-
-a = normer(les_Amplitudes )
-b = normer(les_predictions)
-c = normer(prixs[-len(les_predictions)-1:-1])
+a =          (les_Amplitudes )
+b =          (les_predictions)
+c = normer_11(prixs[-len(les_predictions)-1:-1])
 
 for i in range(int(len(les_predictions)/MEGA_T)):
-	plt.plot([len(les_predictions) - i*MEGA_T]*2, [0, 1])
+	plt.plot([len(les_predictions) - i*MEGA_T]*2, [-1, 1])
 
 	if i == 0:
 		plt.plot(list(range(i*MEGA_T, (i+1)*MEGA_T)), a[i*MEGA_T:(i+1)*MEGA_T], 'm-o', label='o = Amplitude')
@@ -121,17 +86,16 @@ for i in range(int(len(les_predictions)/MEGA_T)):
 		plt.plot(list(range(i*MEGA_T, (i+1)*MEGA_T)), b[i*MEGA_T:(i+1)*MEGA_T], 'y-x')
 	#
 	for j in range(MEGA_T):
-		if b[i*MEGA_T+j] >= 0.5:
+		if b[i*MEGA_T+j] >= 0.0:
 			plt.plot([i*MEGA_T+j, i*MEGA_T+j], [c[i*MEGA_T+j], c[i*MEGA_T+j] + 0.03], 'g')
 		else:
 			plt.plot([i*MEGA_T+j, i*MEGA_T+j], [c[i*MEGA_T+j], c[i*MEGA_T+j] - 0.03], 'r')
-	#plt.plot(list(range(i*MEGA_T, (i+1)*MEGA_T)), c[i*MEGA_T:(i+1)*MEGA_T])
 
-#plt.plot(a, 'o', label='Amplitudes ')
-#plt.plot(b, 'x', label='Predictions')
 plt.plot(c     , 'c-^', label='prix')
 plt.legend()
 plt.show()
+
+####################################################################################
 
 print("len(les_predictions)", len(les_predictions))
 print("len(prixs)          ", len(prixs))
@@ -189,5 +153,3 @@ for sng in [0,1]:
 #
 plt.legend()
 plt.show()
-
-#	Faire correspondre les elements !!!!!

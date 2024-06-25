@@ -28,6 +28,10 @@ nvcc -c impl/insts/activation/activation_df.cu ${A} &
 nvcc -c impl/insts/biais/biais.cu ${A} &
 nvcc -c impl/insts/biais/biais_f.cu ${A} &
 nvcc -c impl/insts/biais/biais_df.cu ${A} &
+#	/insts/cadrans_pondérés
+nvcc -c impl/insts/cadrans_pondérés/cadrans_pondérés.cu ${A} &
+nvcc -c impl/insts/cadrans_pondérés/cadrans_pondérés_f.cu ${A} &
+nvcc -c impl/insts/cadrans_pondérés/cadrans_pondérés_df.cu ${A} &
 #	/insts/const
 nvcc -c impl/insts/const/const.cu ${A} &
 nvcc -c impl/insts/const/const_f.cu ${A} &
@@ -62,6 +66,10 @@ nvcc -c impl/insts/matmul1d/matmul1d_df.cu ${A} &
 nvcc -c impl/insts/matmul1d_canal/matmul1d_canal.cu ${A} &
 nvcc -c impl/insts/matmul1d_canal/matmul1d_canal_f.cu ${A} &
 nvcc -c impl/insts/matmul1d_canal/matmul1d_canal_df.cu ${A} &
+#	/insts/matmul2d_sans_poids
+nvcc -c impl/insts/matmul2d_sans_poids/matmul2d_sans_poids.cu ${A} &
+nvcc -c impl/insts/matmul2d_sans_poids/matmul2d_sans_poids_f.cu ${A} &
+nvcc -c impl/insts/matmul2d_sans_poids/matmul2d_sans_poids_df.cu ${A} &
 #	/insts/mul2
 nvcc -c impl/insts/mul2/mul2.cu ${A} &
 nvcc -c impl/insts/mul2/mul2_f.cu ${A} &
@@ -78,10 +86,10 @@ nvcc -c impl/insts/pool2_1d/pool2_1d_df.cu ${A} &
 nvcc -c impl/insts/pool2x2_2d/pool2x2_2d.cu ${A} &
 nvcc -c impl/insts/pool2x2_2d/pool2x2_2d_f.cu ${A} &
 nvcc -c impl/insts/pool2x2_2d/pool2x2_2d_df.cu ${A} &
-#	/insts/softmax
-nvcc -c impl/insts/softmax/softmax.cu ${A} &
-nvcc -c impl/insts/softmax/softmax_f.cu ${A} &
-nvcc -c impl/insts/softmax/softmax_df.cu ${A} &
+#	/insts/somme
+nvcc -c impl/insts/somme/somme.cu ${A} &
+nvcc -c impl/insts/somme/somme_f.cu ${A} &
+nvcc -c impl/insts/somme/somme_df.cu ${A} &
 ###
 wait
 #	/insts/somme2
@@ -100,6 +108,10 @@ nvcc -c impl/insts/somme4/somme4_df.cu ${A} &
 nvcc -c impl/insts/sub2/sub2.cu ${A} &
 nvcc -c impl/insts/sub2/sub2_f.cu ${A} &
 nvcc -c impl/insts/sub2/sub2_df.cu ${A} &
+#	/insts/vect_div_unitair
+nvcc -c impl/insts/vect_div_unitair/vect_div_unitair.cu ${A} &
+nvcc -c impl/insts/vect_div_unitair/vect_div_unitair_f.cu ${A} &
+nvcc -c impl/insts/vect_div_unitair/vect_div_unitair_df.cu ${A} &
 #	/insts/Y
 nvcc -c impl/insts/Y/Y.cu ${A} &
 nvcc -c impl/insts/Y/Y_f.cu ${A} &
