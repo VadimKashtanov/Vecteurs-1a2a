@@ -2,8 +2,10 @@
 
 #include "etc.cuh"
 
-#define GRAND_T (1*16)
-#define  MEGA_T (2*24)
+#define GRAND_T (1 *  16 )
+#define  MEGA_T (7 * (24))
+
+//	Les Parantèses sont fondamentales !
 
 //Reseaux tanachiques
 //	16*16*N

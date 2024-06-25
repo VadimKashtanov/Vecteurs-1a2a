@@ -3,10 +3,12 @@
 #include "meta.cuh"
 #include "btcusdt.cuh"
 
-#define INSTS 24
+#define INSTS 26
 
 #define MAX_PARAMS 6
 #define MAX_XS     4
+
+#include "activations_generales.cuh"
 
 typedef struct {
 	//

@@ -10,7 +10,8 @@ void adam(
 	Mdl_t   *  mdl,
 	float *** hist,	//[hist][inst][p]
 	uint         i,
-	float    alpha
+	float    alpha,
+	uint         t
 );
 
 void opti(

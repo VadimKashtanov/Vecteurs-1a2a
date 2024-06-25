@@ -2,6 +2,7 @@
 
 #include "etc/cuda.cuh"
 #include "etc/macro.cuh"
+#include "etc/types.cuh"
 
 //  Outils
 float      rnd();
